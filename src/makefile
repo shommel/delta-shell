@@ -1,7 +1,8 @@
 TARGET = sushi
 OBJS = sushi.o sushi_read.o sushi_history.o
 
-CFLAGS = -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-include-dirs -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused #-O3
+#deleting -Wlogical-op due to a compiler error
+CFLAGS = -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-include-dirs -Wredundant-decls -Wshadow -Wsign-conversion -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused #-O3
 
 all: $(TARGET)
 
