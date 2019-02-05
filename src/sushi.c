@@ -8,16 +8,21 @@
 
 int main()
 {
-	
-	sushi_read_config("sushi.conf");
-	//sushi_show_history();
+	int result;
+	if( (result = sushi_read_config("sushi.conf")) == 1){
+		return EXIT_FAILURE;
+	}
 
 	char *line;
 
 	printf("%s", SUSHI_DEFAULT_PROMPT);
-	line = sushi_read_line(stdin);
-	sushi_store(line);
 
+	if(	(line = sushi_read_line(stdin)) == NULL) {
+		return EXIT_FAILURE;
+	}
+
+	sushi_store(line);
 	sushi_show_history();
 	return EXIT_SUCCESS;
+
 }

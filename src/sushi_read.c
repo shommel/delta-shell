@@ -4,63 +4,50 @@
 #include <ctype.h>
 #include "sushi.h"
 
-#define SEP "\n\r"
+#define SEP "\n\r" 
+#define SEP_CODE 10 //ASCII code for newline
 
 char *sushi_read_line(FILE *in) {
 
-	char buffer[SUSHI_MAX_INPUT+1];
+	char buffer[SUSHI_MAX_INPUT+1]; //+1 for the terminating zero
 	char *result;
 	char *tok;
-	//char *tok;
+	int is_blank = 1;
 
-	if(fgets(buffer, sizeof(buffer), in) == NULL){
-		perror(fgets(buffer, sizeof(buffer), in));
+	if(fgets(buffer, sizeof(buffer), in) == NULL){ 
+		perror("Error with memory allocation");
 		return NULL;
 	}
 
-	int is_blank = 1;
+	tok = strtok(buffer, SEP); //seperate by newline
 
-	puts("checking length");
-	
-	// if( buffer != SEP){
-	// 	puts("nonzero");
+	if(tok == NULL){
+		return NULL;
+	}
 
-	// 	tok = malloc( sizeof(buffer) + 1);
-	// 	tok = strtok(buffer, SEP);
+	for(size_t i = 0; i < strlen(tok); i++){
+		if(!isspace(tok[i])){
+			is_blank = 0;
+			break;
+		}
+	}
 
-	// 	puts(tok);
-
-	// 	for(size_t i = 0; i < strlen(tok); i++){
-	// 		puts("checking spaces");
-
-	// 		if(!isspace(tok[i])){
-	// 			is_blank = 0;
-	// 			break;
-	// 		}
-	// 	}
-	// }
-
-	// else{
-	// 	is_blank = 1;
-	// }
-
-	// if(is_blank){
-	// 	puts("fully blank");
-	// 	return NULL;
-	// }
+	if(is_blank){ //return NULL if line is blank
+		return NULL;
+	}
 
 	result = malloc( strlen(tok) + 1);
 	strcpy(result, tok);
-	//free(tok);
-	//puts(result);
 
-	if(strlen(buffer) == SUSHI_MAX_INPUT+1){
-		while( fgets(buffer, sizeof(buffer), in ) != NULL){
-			
+	if(strlen(buffer) == SUSHI_MAX_INPUT){ //enter only when line is longer than max
+		fprintf(stderr, "%s\n", "Line too long, truncated");
+		char *remainder; //variable for cleaning up rest of line
+
+		//cleaning up rest of line
+		while( (remainder = strchr(buffer, SEP_CODE)) == NULL){
+			fgets(buffer, sizeof(buffer), in);
 		}
 	}
-	
-
 
   return result;
 }
@@ -76,8 +63,10 @@ int sushi_read_config(char *fname) {
 
 	char *line;
 
-	while( (line = sushi_read_line(fpIN)) != NULL){
-		sushi_store(line);
+	while( !feof(fpIN) ){ 
+		if( (line = sushi_read_line(fpIN)) != NULL){
+			sushi_store(line);
+		}
 	}
 
 	fclose(fpIN);
