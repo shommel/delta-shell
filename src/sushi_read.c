@@ -4,7 +4,8 @@
 #include <ctype.h>
 #include "sushi.h"
 
-#define SEP "\n\r" 
+#define SEP "\n\r"
+// DZ: 10 is a magic number; use '\n'
 #define SEP_CODE 10 //ASCII code for newline
 
 char *sushi_read_line(FILE *in) {
@@ -14,7 +15,9 @@ char *sushi_read_line(FILE *in) {
 	char *tok;
 	int is_blank = 1;
 
-	if(fgets(buffer, sizeof(buffer), in) == NULL){ 
+	if(fgets(buffer, sizeof(buffer), in) == NULL){
+	  // DZ: Must add "if(!feof(in))"
+	  // DZ: Otherwise one gets "Error with memory allocation: Success"
 		perror("Error with memory allocation");
 		return NULL;
 	}
@@ -36,6 +39,7 @@ char *sushi_read_line(FILE *in) {
 		return NULL;
 	}
 
+	// DZ: Must always check the returned value of malloc
 	result = malloc( strlen(tok) + 1);
 	strcpy(result, tok);
 
@@ -58,6 +62,7 @@ int sushi_read_config(char *fname) {
 
 	if( (fpIN = fopen(fname, "r")) == NULL){ //error opening
 		perror(fname);
+		// DZ: It's OK if the file does not exist!
 		return 1;		
 	}
 

@@ -9,6 +9,7 @@
 int main()
 {
 	int result;
+	// DZ: Must be $HOME/sushi.conf
 	if( (result = sushi_read_config("sushi.conf")) == 1){
 		return EXIT_FAILURE;
 	}

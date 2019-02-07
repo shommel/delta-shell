@@ -6,7 +6,7 @@
 static char *history[SUSHI_HISTORY_LENGTH] = {NULL};
 
 void sushi_store(char *line) {
-
+  // DZ: Must check if line is NULL
 	if(history[SUSHI_HISTORY_LENGTH-1] == NULL){ 
 		free(history[SUSHI_HISTORY_LENGTH-1]);
 	}
@@ -25,6 +25,7 @@ void sushi_show_history() {
 		if(history[i] != NULL){
 			printf("% 5d  %s\n", i+1, history[i]); //right justified to 5 dec. places
 		}
+		// DZ: "else { break; }"
 
 	}
 
