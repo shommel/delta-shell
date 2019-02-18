@@ -1376,12 +1376,12 @@ yyreduce:
 
   case 20:
 #line 69 "sushi_yyparser.y"
-    { system("history"); ;}
+    { sushi_show_history(); ;}
     break;
 
   case 21:
 #line 70 "sushi_yyparser.y"
-    { exit(EXIT_SUCCESS); ;}
+    { sushi_exit=1; ;}
     break;
 
   case 29:

@@ -12,6 +12,7 @@ int main()
 	}
 
 	char *line;
+	int i = 0;
 
 	while(sushi_exit == 0){
 		printf("%s", SUSHI_DEFAULT_PROMPT);
@@ -23,9 +24,7 @@ int main()
 			sushi_store(line);
 		}
 
-	}	
-	
-	sushi_show_history();
-	return EXIT_SUCCESS;
+	}
 
+	return EXIT_SUCCESS;
 }

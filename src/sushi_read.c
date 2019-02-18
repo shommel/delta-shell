@@ -5,6 +5,7 @@
 #include "sushi.h"
 
 #define SEP "\n" 
+#define SEP_CODE 10
 
 char *sushi_read_line(FILE *in) {
 
@@ -48,8 +49,9 @@ char *sushi_read_line(FILE *in) {
 		char *remainder; //variable for cleaning up rest of line
 
 		//cleaning up rest of line
-		while( (remainder = strchr(buffer, (int) SEP)) == NULL){
+		while( (remainder = strchr(buffer, SEP_CODE)) == NULL){
 			fgets(buffer, sizeof(buffer), in);
+			//puts("stuck here");
 		}
 	}
 
@@ -64,7 +66,6 @@ int sushi_read_config(char *fname) {
 		return 1;		
 	}
 
-
 	char *line;
 	int result;
 	while( !feof(fpIN) ){ 
@@ -74,7 +75,6 @@ int sushi_read_config(char *fname) {
 			}
 		}
 	}
-
 	fclose(fpIN);
 
   return 0;
