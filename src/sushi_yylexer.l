@@ -3,6 +3,7 @@
 #include "sushi_yyparser.tab.h"
 #ifdef __APPLE__
 extern int yylex(void);
+extern int yyparse(void);
 #endif
 %}
 
@@ -59,4 +60,7 @@ int sushi_parse_command(char *command) {
   int retval = yyparse();
   yy_delete_buffer(buffer);
   return retval;
+
 }
+
+

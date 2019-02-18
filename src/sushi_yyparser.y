@@ -1,5 +1,6 @@
 %{
 #include "sushi.h"
+#include <stdlib.h>
   int yylex();
   void yyerror(const char* s);  
 %}
@@ -65,8 +66,8 @@ bgmode: /* Done */
 program: 
   args /* TODO */
 | arg YY_SUSHI_SET arg  /* TODO */
-| YY_SUSHI_HISTORY { /* Add your code here */ }
-| YY_SUSHI_EXIT { /* Add your code here */ }
+| YY_SUSHI_HISTORY { system("history"); }
+| YY_SUSHI_EXIT { exit(EXIT_SUCCESS); }
 | YY_SUSHI_JOBS /* TODO */
 | YY_SUSHI_PWD  /* TODO */
 | YY_SUSHI_CD arg /* TODO */

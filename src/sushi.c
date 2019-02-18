@@ -2,9 +2,7 @@
 #include <stdio.h>
 #include "sushi.h"
 
-// int main(int argc, char *argv[]) {
-//     return EXIT_SUCCESS;
-// }
+int sushi_exit = 0;
 
 int main()
 {
@@ -15,13 +13,18 @@ int main()
 
 	char *line;
 
-	printf("%s", SUSHI_DEFAULT_PROMPT);
+	while(sushi_exit == 0){
+		printf("%s", SUSHI_DEFAULT_PROMPT);
+		if(	(line = sushi_read_line(stdin)) == NULL) {
+			return EXIT_FAILURE;
+		}
 
-	if(	(line = sushi_read_line(stdin)) == NULL) {
-		return EXIT_FAILURE;
-	}
+		if( (result = sushi_parse_command(line)) == 0 ){
+			sushi_store(line);
+		}
 
-	sushi_store(line);
+	}	
+	
 	sushi_show_history();
 	return EXIT_SUCCESS;
 

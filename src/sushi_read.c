@@ -4,8 +4,7 @@
 #include <ctype.h>
 #include "sushi.h"
 
-#define SEP "\n\r" 
-#define SEP_CODE 10 //ASCII code for newline
+#define SEP "\n" 
 
 char *sushi_read_line(FILE *in) {
 
@@ -14,7 +13,7 @@ char *sushi_read_line(FILE *in) {
 	char *tok;
 	int is_blank = 1;
 
-	if(fgets(buffer, sizeof(buffer), in) == NULL){ 
+	if( (fgets(buffer, sizeof(buffer), in) == NULL) && (!feof(in)) ) { 
 		perror("Error with memory allocation");
 		return NULL;
 	}
@@ -37,6 +36,11 @@ char *sushi_read_line(FILE *in) {
 	}
 
 	result = malloc( strlen(tok) + 1);
+	if(result == NULL){
+		perror("Error with memory allocation");
+		return NULL;
+	}
+
 	strcpy(result, tok);
 
 	if(strlen(buffer) == SUSHI_MAX_INPUT){ //enter only when line is longer than max
@@ -44,7 +48,7 @@ char *sushi_read_line(FILE *in) {
 		char *remainder; //variable for cleaning up rest of line
 
 		//cleaning up rest of line
-		while( (remainder = strchr(buffer, SEP_CODE)) == NULL){
+		while( (remainder = strchr(buffer, (int) SEP)) == NULL){
 			fgets(buffer, sizeof(buffer), in);
 		}
 	}
@@ -57,15 +61,17 @@ int sushi_read_config(char *fname) {
 	FILE *fpIN;
 
 	if( (fpIN = fopen(fname, "r")) == NULL){ //error opening
-		perror(fname);
 		return 1;		
 	}
 
-	char *line;
 
+	char *line;
+	int result;
 	while( !feof(fpIN) ){ 
 		if( (line = sushi_read_line(fpIN)) != NULL){
-			sushi_store(line);
+			if( (result = sushi_parse_command(line)) == 0 ){
+				sushi_store(line);
+			}
 		}
 	}
 
