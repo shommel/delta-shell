@@ -22,7 +22,7 @@ void char_lookup_setup(){
 
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char * s) {
-
+/*
 	char *result;
 	result = malloc(strlen(s) + 1);
 
@@ -30,26 +30,26 @@ char *sushi_unquote(char * s) {
 		perror("lexical analyzer");
 		return NULL;
 	}
-
+*/
 	for(size_t i = 0, j = 0; i < strlen(s); i++, j++){
 
 		if( (s[i] == '\\') && (char_lookup[ (int) s[i+1]] != '\0') ){
-			result[j] = char_lookup[ (int) s[i+1]];
+			s[j] = char_lookup[ (int) s[i+1]];
 			i++;
 		}
 
 		else{
-			result[j] = s[i];
+			s[j] = s[i];
 		}
 	}
-
+/*
 	result = realloc(result, strlen(result) + 1);
 	if(result == NULL){
 		perror("lexical analyzer");
 		return NULL;
 	}
-
-  return result;
+*/
+  return s;
 }
 
 // Do not modify this function

@@ -1,6 +1,6 @@
 %{
 #include "sushi.h"
-#include <stdlib.h>
+#include <stdlib.h> //Added stdlib.h for action use that involve c program functions
   int yylex();
   void yyerror(const char* s);  
 %}
@@ -66,8 +66,8 @@ bgmode: /* Done */
 program: 
   args /* TODO */
 | arg YY_SUSHI_SET arg  /* TODO */
-| YY_SUSHI_HISTORY { sushi_show_history(); }
-| YY_SUSHI_EXIT { sushi_exit=1; }
+| YY_SUSHI_HISTORY { sushi_show_history(); } /* Called sushi_history to be returned when the user types in "!" */
+| YY_SUSHI_EXIT { sushi_exit=1; }	/* Put in sushi_exit = 1, so when the user types in "exit", the program exits */
 | YY_SUSHI_JOBS /* TODO */
 | YY_SUSHI_PWD  /* TODO */
 | YY_SUSHI_CD arg /* TODO */
