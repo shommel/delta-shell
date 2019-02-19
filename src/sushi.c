@@ -21,9 +21,7 @@ int main()
 		if(	(line = sushi_read_line(stdin)) == NULL) {
 			return EXIT_FAILURE;
 		}
-
-		//line = sushi_unquote(line); 
-
+		
 		if( (result = sushi_parse_command(line)) == 0 ){
 			sushi_store(line);
 		}

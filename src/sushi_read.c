@@ -51,7 +51,6 @@ char *sushi_read_line(FILE *in) {
 		//cleaning up rest of line
 		while( (remainder = strchr(buffer, SEP_CODE)) == NULL){
 			fgets(buffer, sizeof(buffer), in);
-			//puts("stuck here");
 		}
 	}
 
