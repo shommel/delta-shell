@@ -14,6 +14,7 @@ void sushi_store(char *line);
 void sushi_show_history();
 char *sushi_unquote(char * s);
 int sushi_parse_command(char *command);
+void char_lookup_setup();
 
 extern int sushi_exit; // The global exit flag
 

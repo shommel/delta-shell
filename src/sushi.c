@@ -6,6 +6,8 @@ int sushi_exit = 0;
 
 int main()
 {
+	char_lookup_setup();
+
 	int result;
 	if( (result = sushi_read_config("sushi.conf")) == 1){
 		return EXIT_FAILURE;
@@ -19,6 +21,8 @@ int main()
 		if(	(line = sushi_read_line(stdin)) == NULL) {
 			return EXIT_FAILURE;
 		}
+
+		//line = sushi_unquote(line); 
 
 		if( (result = sushi_parse_command(line)) == 0 ){
 			sushi_store(line);

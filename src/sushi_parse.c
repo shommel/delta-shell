@@ -4,12 +4,9 @@
 #include <string.h>
 
 
-// https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
-char *sushi_unquote(char *s) {
+static char char_lookup[128] = { '\0' };
 
-	//puts(s);
-
-	char char_lookup[128] = { '\0' };
+void char_lookup_setup(){
 	char_lookup['a'] = '\a';
 	char_lookup['b'] = '\b';
 	char_lookup['f'] = '\f';
@@ -21,48 +18,36 @@ char *sushi_unquote(char *s) {
 	char_lookup['\''] = '\'';
 	char_lookup['\"'] = '\"';
 	char_lookup['?'] = '\?';
+}
+
+// https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
+char *sushi_unquote(char * s) {
 
 	char *result;
-	result = malloc(sizeof(s) + 1);
+	result = malloc(strlen(s) + 1);
 
-	// if(result == NULL){
-	// 	return s;
-	// }
+	if(result == NULL){
+		perror("lexical analyzer");
+		return NULL;
+	}
 
-	int j = 0;
+	for(size_t i = 0, j = 0; i < strlen(s); i++, j++){
 
-	for(size_t i = 0; i < strlen(s); ++i){
-		//printf("%zu\n", i);
-		// if( (i + 1) >= strlen(s) ){
-		// 	result[j] = s[i];
-		// 	break;
-		// }
-
-		if(s[i] == '\\'){
-			if(char_lookup[ (int) s[i+1]] != '\0'){
-				result[j] = char_lookup[ (int) s[i+1]];
-				//puts("1");
-				i++;
-			}
-
-			else{
-				result[j] = s[i];
-			}
-
+		if( (s[i] == '\\') && (char_lookup[ (int) s[i+1]] != '\0') ){
+			result[j] = char_lookup[ (int) s[i+1]];
+			i++;
 		}
 
 		else{
-			//puts("2");
 			result[j] = s[i];
 		}
-
-		//puts(result);
-		j++;
-
 	}
 
-	//result = realloc(result, sizeof(result));
-	//puts(result);
+	result = realloc(result, strlen(result) + 1);
+	if(result == NULL){
+		perror("lexical analyzer");
+		return NULL;
+	}
 
   return result;
 }

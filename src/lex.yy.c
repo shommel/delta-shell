@@ -799,8 +799,7 @@ YY_RULE_SETUP
 case 7:
 YY_RULE_SETUP
 #line 30 "sushi_yylexer.l"
-{ yylval.s = strdup(sushi_unquote(yytext + 1));
-                  //puts(yytext);
+{ yylval.s = sushi_unquote(yytext);
                   return YY_SUSHI_TOK; }
 	YY_BREAK
 case 8:
@@ -808,15 +807,13 @@ YY_RULE_SETUP
 #line 32 "sushi_yylexer.l"
 { yytext[strlen(yytext) - 1] = 0;
                   yylval.s = strdup(yytext + 1);
-                  //puts(yytext);
-                  //printf("%s\n", YY_SUSHI_TOK);
                   return YY_SUSHI_TOK; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 35 "sushi_yylexer.l"
 { yytext[strlen(yytext) - 1] = 0;
-                  yylval.s = strdup(sushi_unquote(yytext + 1));
+                  yylval.s = sushi_unquote(yytext + 1);
                   return YY_SUSHI_TOK; }
 	YY_BREAK
 case 10:
@@ -1887,6 +1884,5 @@ int sushi_parse_command(char *command) {
   return retval;
 
 }
-
 
 
