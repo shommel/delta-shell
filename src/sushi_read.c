@@ -15,7 +15,7 @@ char *sushi_read_line(FILE *in) {
 	int is_blank = 1;
 
 	if( (fgets(buffer, sizeof(buffer), in) == NULL) && (!feof(in)) ) { 
-		perror("Error with memory allocation");
+		perror("sushi_read_line: error reading buffer");
 		return NULL;
 	}
 
@@ -38,7 +38,7 @@ char *sushi_read_line(FILE *in) {
 
 	result = malloc( strlen(tok) + 1);
 	if(result == NULL){
-		perror("Error with memory allocation");
+		perror("sushi_read_line: Error with memory allocation");
 		return NULL;
 	}
 
@@ -60,10 +60,12 @@ char *sushi_read_line(FILE *in) {
 int sushi_read_config(char *fname) {
 
 	FILE *fpIN;
-
-	if( (fpIN = fopen(fname, "r")) == NULL){ //error opening
-		return 1;		
+	if( (fpIN = fopen(fname, "r")) ==  NULL){
+		//It's OK if the file does not exist!
+		perror("sushi_read_config: error opening file");
+		return 1;
 	}
+	
 
 	char *line;
 	int result;
@@ -74,7 +76,11 @@ int sushi_read_config(char *fname) {
 			}
 		}
 	}
-	fclose(fpIN);
+
+	if( (result =  fclose(fpIN)) != 0){
+		perror("sushi_read_config: error closing file");
+		return 1;
+	}
 
   return 0;
 }

@@ -6,7 +6,7 @@ int sushi_exit = 0;
 
 int main()
 {
-	char_lookup_setup();
+	char_lookup_setup(); //initialize char_lookup table
 
 	int result;
 	if( (result = sushi_read_config("sushi.conf")) == 1){
@@ -16,7 +16,7 @@ int main()
 	char *line;
 	int i = 0;
 
-	while(sushi_exit == 0){
+	while(sushi_exit == 0){ //until user types "exit"
 		printf("%s", SUSHI_DEFAULT_PROMPT);
 		if(	(line = sushi_read_line(stdin)) == NULL) {
 			return EXIT_FAILURE;

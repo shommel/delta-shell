@@ -15,6 +15,7 @@ void sushi_store(char *line) {
 		free(history[SUSHI_HISTORY_LENGTH-1]);
 	}
 
+	//copy block of memory
 	bcopy(history, &(history[1]), sizeof(char *) * (SUSHI_HISTORY_LENGTH-1));
 
 	history[0] = line; //add most recent line to history
@@ -29,6 +30,7 @@ void sushi_show_history() {
 		if(history[i] != NULL){
 			printf("% 5d  %s\n", i+1, history[i]); //right justified to 5 dec. places
 		}
+
 		else{
 			break;
 		}

@@ -7,6 +7,8 @@
 static char char_lookup[128] = { '\0' };
 
 void char_lookup_setup(){
+	//changes the char_lookup table with all necessary escape sequences
+
 	char_lookup['a'] = '\a';
 	char_lookup['b'] = '\b';
 	char_lookup['f'] = '\f';
@@ -22,33 +24,20 @@ void char_lookup_setup(){
 
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char * s) {
-/*
-	char *result;
-	result = malloc(strlen(s) + 1);
 
-	if(result == NULL){
-		perror("lexical analyzer");
-		return NULL;
-	}
-*/
+	//i is reader pointer, j is writer pointer
 	for(size_t i = 0, j = 0; i < strlen(s); i++, j++){
 
 		if( (s[i] == '\\') && (char_lookup[ (int) s[i+1]] != '\0') ){
 			s[j] = char_lookup[ (int) s[i+1]];
-			i++;
+			i++; //eat next character
 		}
 
 		else{
 			s[j] = s[i];
 		}
 	}
-/*
-	result = realloc(result, strlen(result) + 1);
-	if(result == NULL){
-		perror("lexical analyzer");
-		return NULL;
-	}
-*/
+
   return s;
 }
 
