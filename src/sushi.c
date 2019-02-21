@@ -1,15 +1,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "sushi.h"
+#include <string.h>
 
 int sushi_exit = 0;
 
 int main()
 {
+
+	
 	char_lookup_setup();
+	char *path = getenv("HOME");
+	puts(path);
 
 	int result;
-	if( (result = sushi_read_config("sushi.conf")) == 1){
+	if( (result = sushi_read_config(strcat(path,"/sushi.conf"))) == 1){
 		return EXIT_FAILURE;
 	}
 
