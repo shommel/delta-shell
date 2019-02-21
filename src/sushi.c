@@ -5,17 +5,11 @@
 
 int sushi_exit = 0;
 
-int main()
-{
-<<<<<<< HEAD
+int main() {
 
-	
-	char_lookup_setup();
 	char *path = getenv("HOME");
-	puts(path);
-=======
 	char_lookup_setup(); //initialize char_lookup table
->>>>>>> efbfbbc18afd8c3008206788326824b6b82009e8
+
 
 	int result;
 	if( (result = sushi_read_config(strcat(path,"/sushi.conf"))) == 1){
