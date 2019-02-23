@@ -62,7 +62,10 @@ int sushi_read_config(char *fname) {
 	FILE *fpIN;
 	if( (fpIN = fopen(fname, "r")) ==  NULL){
 		//It's OK if the file does not exist!
+	  // DZ: must be perror(fname)
+	  // DZ: let perror() decide why it cannot be opened
 		perror("sushi_read_config: error opening file");
+		// DZ: So why do you return 1 if it's ok?
 		return 1;
 	}
 	
@@ -78,6 +81,7 @@ int sushi_read_config(char *fname) {
 	}
 
 	if( (result =  fclose(fpIN)) != 0){
+	  // DZ: Must be perror(fname)
 		perror("sushi_read_config: error closing file");
 		return 1;
 	}

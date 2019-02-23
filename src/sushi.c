@@ -12,6 +12,8 @@ int main() {
 
 
 	int result;
+	// DZ: There is not enough space in path for the combined string
+	// DZ: Must allocate enough space, then strcpy, then strcat
 	if( (result = sushi_read_config(strcat(path,"/sushi.conf"))) == 1){
 		return EXIT_FAILURE;
 	}
