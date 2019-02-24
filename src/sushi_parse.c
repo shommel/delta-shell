@@ -1,5 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
+#include "sushi.h"
 #include "sushi_yyparser.tab.h"
 #include <string.h>
 
@@ -41,7 +40,28 @@ char *sushi_unquote(char * s) {
   return s;
 }
 
-// Do not modify this function
+// Do not modify these functions
 void yyerror(const char* s) {
   fprintf(stderr, "Parse error: %s\n", s);
+}
+
+void __not_implemented__() {  
+  fputs("This operation is not implemented yet\n", stderr);
+}
+
+// Function skeletons for HW3
+void free_memory(prog_t *exe, prog_t *pipe) {
+  // TODO - but not this time
+}
+
+int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
+  return 0; // TODO
+}
+
+void *super_malloc(size_t size) {
+  return NULL; // TODO
+}
+
+void *super_realloc(void *ptr, size_t size) {
+  return NULL; // TODO
 }

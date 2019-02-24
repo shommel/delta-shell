@@ -5,6 +5,15 @@
 
 int sushi_exit = 0;
 
+static void refuse_to_die(int sig)
+{
+  // TODO
+}
+
+static void prevent_interruption() {
+  // TODO
+}
+
 int main() {
 
 	char *path = getenv("HOME");
@@ -16,9 +25,9 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
+	prevent_interruption();
 	char *line;
 	int i = 0;
-
 	while(sushi_exit == 0){ //until user types "exit"
 		printf("%s", SUSHI_DEFAULT_PROMPT);
 		if(	(line = sushi_read_line(stdin)) == NULL) {
