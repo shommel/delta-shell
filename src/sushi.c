@@ -7,7 +7,6 @@ int sushi_exit = 0;
 
 static void refuse_to_die(int sig)
 {
-	sig++;
   // TODO
 }
 
@@ -19,7 +18,7 @@ int main() {
 
 	char_lookup_setup(); //initialize char_lookup table
 
-	char *path = super_malloc(strlen(getenv("HOME") + strlen("/sushi.conf") + 1));
+	char *path = super_malloc( strlen(getenv("HOME")) + strlen("/sushi.conf") + 1);
 	strcpy(path, getenv("HOME"));
 	strcat(path,"/sushi.conf");
 
@@ -27,6 +26,7 @@ int main() {
 	if( (result = sushi_read_config(path)) == 1){
 		return EXIT_FAILURE;
 	}
+
 	free(path);
 
 

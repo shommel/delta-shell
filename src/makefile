@@ -6,13 +6,14 @@ CFLAGS = -Wall -pedantic -Wextra -Wcast-align -Wcast-qual \
 	-Wdisabled-optimization -Wformat=2 -Winit-self \
 	-Wmissing-include-dirs -Wredundant-decls -Wshadow \
 	-Wstrict-overflow=5 -Wundef -Wno-unused \
-	-Wno-sign-compare \
-	-g #-Werror #-O3 -Wlogical-op -Wsign-conversion -Wswitch-default 
+	-Wno-sign-compare -g -Werror -Wno-unused-parameter \
+	-Wswitch-default  -O3 
+	# -Wlogical-op -Wsign-conversion -Wswitch-default 
 
 all: $(TARGET)
 
 sushi: $(OBJS)
-	$(CC) $(OBJS) -o $(TARGET) -lefence
+	$(CC) $(OBJS) -o $(TARGET)
 
 sushi.o: sushi.c sushi.h
 

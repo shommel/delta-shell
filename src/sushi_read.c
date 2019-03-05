@@ -39,9 +39,6 @@ char *sushi_read_line(FILE *in) {
 	result = super_malloc( strlen(tok) + 1);
 	strcpy(result, tok);
 
-	puts("after strcpy");
-
-
 	if(strlen(buffer) == SUSHI_MAX_INPUT){ //enter only when line is longer than max
 		fprintf(stderr, "%s\n", "Line too long, truncated");
 		char *remainder; //variable for cleaning up rest of line
