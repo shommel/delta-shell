@@ -5,14 +5,14 @@ OBJS = sushi.o sushi_read.o sushi_history.o sushi_parse.o \
 CFLAGS = -Wall -pedantic -Wextra -Wcast-align -Wcast-qual \
 	-Wdisabled-optimization -Wformat=2 -Winit-self \
 	-Wmissing-include-dirs -Wredundant-decls -Wshadow \
-	-Wstrict-overflow=5 -Wundef -Werror -Wno-unused \
+	-Wstrict-overflow=5 -Wundef -Wno-unused \
 	-Wno-sign-compare \
-	-g #-O3 -Wlogical-op -Wsign-conversion -Wswitch-default 
+	-g #-Werror #-O3 -Wlogical-op -Wsign-conversion -Wswitch-default 
 
 all: $(TARGET)
 
 sushi: $(OBJS)
-	$(CC) $(OBJS) -o $(TARGET)
+	$(CC) $(OBJS) -o $(TARGET) -lefence
 
 sushi.o: sushi.c sushi.h
 

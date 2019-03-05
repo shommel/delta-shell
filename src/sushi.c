@@ -7,6 +7,7 @@ int sushi_exit = 0;
 
 static void refuse_to_die(int sig)
 {
+	sig++;
   // TODO
 }
 
@@ -16,16 +17,21 @@ static void prevent_interruption() {
 
 int main() {
 
-	char *path = getenv("HOME");
 	char_lookup_setup(); //initialize char_lookup table
 
+	char *path = super_malloc(strlen(getenv("HOME") + strlen("/sushi.conf") + 1));
+	strcpy(path, getenv("HOME"));
+	strcat(path,"/sushi.conf");
 
 	int result;
-	if( (result = sushi_read_config(strcat(path,"/sushi.conf"))) == 1){
+	if( (result = sushi_read_config(path)) == 1){
 		return EXIT_FAILURE;
 	}
+	free(path);
+
 
 	prevent_interruption();
+
 	char *line;
 	int i = 0;
 	while(sushi_exit == 0){ //until user types "exit"

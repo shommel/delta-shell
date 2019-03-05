@@ -86,20 +86,20 @@ bg_mode:
 
 exe: 
 args {
-  $$ = malloc(sizeof(prog_t));
+  $$ = super_malloc(sizeof(prog_t));
   $$->args = $1;
   $$->redirection.in = $$->redirection.out1 = $$->redirection.out2 = NULL;
   $$->next = NULL; }
 
 args:  
   arg      {
-    $$.args = malloc(sizeof(char*)); // New argument array
+    $$.args = super_malloc(sizeof(char*)); // New argument array
     $$.args[0] = $1; // Its first element
     $$.size = 1; }
 | args arg {
     $$ = $1;
     $$.size++; // Increase argument array size
-    $$.args = realloc($$.args, sizeof(char*) * $$.size); // Add storage
+    $$.args = super_realloc($$.args, sizeof(char*) * $$.size); // Add storage
     $$.args[$$.size - 1] = $2; } // Add the last element
 
 arg: 

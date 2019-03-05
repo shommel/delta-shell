@@ -15,7 +15,7 @@ char *sushi_read_line(FILE *in) {
 	int is_blank = 1;
 
 	if( (fgets(buffer, sizeof(buffer), in) == NULL) && (!feof(in)) ) { 
-		perror("sushi_read_line: error reading buffer");
+		perror("fgets");
 		return NULL;
 	}
 
@@ -36,13 +36,11 @@ char *sushi_read_line(FILE *in) {
 		return NULL;
 	}
 
-	result = malloc( strlen(tok) + 1);
-	if(result == NULL){
-		perror("sushi_read_line: Error with memory allocation");
-		return NULL;
-	}
-
+	result = super_malloc( strlen(tok) + 1);
 	strcpy(result, tok);
+
+	puts("after strcpy");
+
 
 	if(strlen(buffer) == SUSHI_MAX_INPUT){ //enter only when line is longer than max
 		fprintf(stderr, "%s\n", "Line too long, truncated");
@@ -62,8 +60,7 @@ int sushi_read_config(char *fname) {
 	FILE *fpIN;
 	if( (fpIN = fopen(fname, "r")) ==  NULL){
 		//It's OK if the file does not exist!
-		perror("sushi_read_config: error opening file");
-		return 1;
+		perror(fname);
 	}
 	
 
@@ -78,7 +75,7 @@ int sushi_read_config(char *fname) {
 	}
 
 	if( (result =  fclose(fpIN)) != 0){
-		perror("sushi_read_config: error closing file");
+		perror(fname);
 		return 1;
 	}
 

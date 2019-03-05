@@ -6,7 +6,7 @@
 static char char_lookup[128] = { '\0' };
 
 void char_lookup_setup(){
-	//changes the char_lookup table with all necessary escape sequences
+	//changes the char_lookup table with alloc necessary escape sequences
 
 	char_lookup['a'] = '\a';
 	char_lookup['b'] = '\b';
@@ -59,9 +59,32 @@ int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
 }
 
 void *super_malloc(size_t size) {
-  return NULL; // TODO
+	puts("entering super_malloc");
+
+	void *ptr = malloc(size);
+	puts("malloc_initiated");
+
+	if(ptr == NULL) { abort(); }	
+
+	puts("leaving super_malloc");
+
+  return ptr; // TODO
 }
 
 void *super_realloc(void *ptr, size_t size) {
-  return NULL; // TODO
+	puts("nothing");
+
+	ptr = realloc(ptr, size);
+
+	if(ptr == NULL) { abort(); }
+
+  return ptr; // TODO
+}
+
+char *super_strdup(char *ptr) {
+	char *ptr2 = strdup(ptr);
+
+	if(ptr2 == NULL) { abort(); }
+
+	return ptr2;
 }
