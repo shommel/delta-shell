@@ -54,8 +54,56 @@ void free_memory(prog_t *exe, prog_t *pipe) {
   // TODO - but not this time
 }
 
-int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
-  return 0; // TODO
+int spawn(prog_t *exe, prog_t *pipe, int bgmode){
+
+	
+	char *cmd = "ls"; //ls command to be executing by child
+	char *argv[3];
+	argv[0] = "ls";
+	argv[1] = "-la";
+	argv[2] = NULL;
+
+	pid_t pid;
+	pid = fork();
+	if(pid < 0){ //General Forking
+		
+		fprintf(stderr, "Child Forking Process has Failed %d\n", errno); //If the Child Forking fails, exit 	
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0){ //Child Process
+		
+		int j;
+		if (execvp(cmd, argv) < 0){ //When execvp fails, we call exit(0) and print out that it failed
+			printf("Error, exec failed\n");
+			exit(0);	
+		} 
+		for (j = 0; j < 1; j++){
+			execvp(cmd, argv);
+			perror("Fork Error");		
+		}
+		
+		_exit(0);
+	}
+	else{ // Parent Process
+		
+		int i;
+		free_memory(exe, pipe); // Called Function (which is tested and works)
+		
+		
+		//perror("Error with Parent Fork"); //perror displays error with the Parent Process
+		
+		/*for (i = 0; i < 5; i++){
+			
+			printf("parent: %d\n", i); //Parent counting tester
+			sleep(1);
+			
+		}*/
+		
+			
+			
+	}
+
+	return 0;
 }
 
 void *super_malloc(size_t size) {
