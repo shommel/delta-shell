@@ -1,17 +1,30 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "sushi.h"
 #include <string.h>
+#include "sushi.h"
+#include <signal.h>
+
 
 int sushi_exit = 0;
 
 static void refuse_to_die(int sig)
 {
-  // TODO
+	if(sig == SIGINT){ 	
+		fprintf(stderr, "\n%s\n", "Type exit to exit the shell");
+	}
 }
 
+//https://www.gnu.org/software/libc/manual/html_node/Sigaction-Function-Example.html
+//https://unix.stackexchange.com/questions/351312/sigint-handler-runs-only-once
 static void prevent_interruption() {
-  // TODO
+
+    struct sigaction action;
+
+    action.sa_handler = refuse_to_die;
+    sigemptyset(&action.sa_mask);
+    sigaddset(&action.sa_mask, SIGINT);
+    sigaction(SIGINT, &action, NULL);
+    
 }
 
 int main() {
@@ -26,9 +39,7 @@ int main() {
 	if( (result = sushi_read_config(path)) == 1){
 		return EXIT_FAILURE;
 	}
-
 	free(path);
-
 
 	prevent_interruption();
 
@@ -39,7 +50,6 @@ int main() {
 		if(	(line = sushi_read_line(stdin)) == NULL) {
 			return EXIT_FAILURE;
 		}
-		
 		if( (result = sushi_parse_command(line)) == 0 ){
 			sushi_store(line);
 		}

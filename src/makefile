@@ -7,7 +7,7 @@ CFLAGS = -Wall -pedantic -Wextra -Wcast-align -Wcast-qual \
 	-Wmissing-include-dirs -Wredundant-decls -Wshadow \
 	-Wstrict-overflow=5 -Wundef -Wno-unused \
 	-Wno-sign-compare -g -Werror -Wno-unused-parameter \
-	-Wswitch-default  -O3 
+	-Wswitch-default -O3 
 	# -Wlogical-op -Wsign-conversion -Wswitch-default 
 
 all: $(TARGET)

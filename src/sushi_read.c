@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 #include "sushi.h"
 
 #define SEP "\n" 
@@ -60,7 +61,6 @@ int sushi_read_config(char *fname) {
 		perror(fname);
 	}
 	
-
 	char *line;
 	int result;
 	while( !feof(fpIN) ){ 
