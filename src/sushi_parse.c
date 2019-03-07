@@ -28,6 +28,7 @@ char *sushi_unquote(char * s) {
 	//reverting to old sushi_unquote from commit 2bafa0db01efbcbe21bd00d5516863da338ee4fb
 
 	char *result;
+	
 	result = super_malloc(strlen(s) + 1);
 
 	for(size_t i = 0, j = 0; i < strlen(s); i++, j++){
@@ -45,7 +46,6 @@ char *sushi_unquote(char * s) {
 	result = super_realloc(result, strlen(result) + 1);
 
 	return result;
-	
 	
 }
 
@@ -110,7 +110,7 @@ void *super_realloc(void *ptr, size_t size) {
 
 char *super_strdup(char *ptr) {
 	char *ptr2 = strdup(ptr);
-	puts(ptr2);
+
 	if(ptr2 == NULL) { abort(); }
 
 	return ptr2;
