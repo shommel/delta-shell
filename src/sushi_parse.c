@@ -35,7 +35,7 @@ char *sushi_unquote(char * s) {
 		else{
 			s[j] = s[i];
 		}
-		
+
 	}
 
   return s;
