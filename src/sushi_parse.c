@@ -24,20 +24,29 @@ void char_lookup_setup(){
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char * s) {
 
-	//i is reader pointer, j is writer pointer
+	//had issues with the substituing in the escape characters
+	//reverting to old sushi_unquote from commit 2bafa0db01efbcbe21bd00d5516863da338ee4fb
+
+	char *result;
+	result = super_malloc(strlen(s) + 1);
+
 	for(size_t i = 0, j = 0; i < strlen(s); i++, j++){
-
-		if( (s[i] == '\\') && (char_lookup[ (int) s[i+1]] != '\0') ){
-			s[j] = char_lookup[ (int) s[i+1]];
-			i++; //eat next character
-		}
-
-		else{
-			s[j] = s[i];
-		}
+	
+			if( (s[i] == '\\') && (char_lookup[ (int) s[i+1]] != '\0') ){
+				result[j] = char_lookup[ (int) s[i+1]];
+				i++; //eat next character
+			}
+	
+			else{
+				result[j] = s[i];
+			}
 	}
 
-  return s;
+	result = super_realloc(result, strlen(result) + 1);
+
+	return result;
+	
+	
 }
 
 // Do not modify these functions
@@ -58,7 +67,7 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 int spawn(prog_t *exe, prog_t *pipe, int bgmode){
 
 	exe->args.args = super_realloc(exe->args.args, (exe->args.size + 1) * sizeof(char *) );
-	exe->args.args[exe->args.size] = NULL;
+	exe->args.args[exe->args.size] = NULL; //the form that execvp expects
 
 	pid_t result = fork();
 
@@ -73,7 +82,6 @@ int spawn(prog_t *exe, prog_t *pipe, int bgmode){
 		if(status < 0){
 			perror(exe->args.args[0]);
 			exit(0);
-
 		}		
 	}
 
@@ -102,7 +110,7 @@ void *super_realloc(void *ptr, size_t size) {
 
 char *super_strdup(char *ptr) {
 	char *ptr2 = strdup(ptr);
-
+	puts(ptr2);
 	if(ptr2 == NULL) { abort(); }
 
 	return ptr2;

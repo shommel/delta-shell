@@ -50,13 +50,12 @@ int main() {
 	int i = 0;
 	while(sushi_exit == 0){ //until user types "exit"
 		printf("%s", SUSHI_DEFAULT_PROMPT);
-		if(	(line = sushi_read_line(stdin)) == NULL) {
-			return EXIT_FAILURE;
-		}
-		if( (result = sushi_parse_command(line)) == 0 ){
-			sushi_store(line);
-		}
 
+		if( (line = sushi_read_line(stdin)) != NULL){
+			if( (result = sushi_parse_command(line)) == 0 ){
+				sushi_store(line);
+			}
+		}
 
 	}
 

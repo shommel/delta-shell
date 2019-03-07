@@ -23,7 +23,7 @@ char *sushi_read_line(FILE *in) {
 
 	tok = strtok(buffer, SEP); //seperate by newline
 
-	if(tok == NULL){
+	if(tok == NULL) {
 		return NULL;
 	}
 
