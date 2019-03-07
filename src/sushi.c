@@ -57,6 +57,7 @@ int main() {
 			sushi_store(line);
 		}
 
+
 	}
 
 	return EXIT_SUCCESS;

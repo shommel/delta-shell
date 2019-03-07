@@ -1,7 +1,7 @@
+#include <string.h>
+#include <errno.h>
 #include "sushi.h"
 #include "sushi_yyparser.tab.h"
-#include <string.h>
-
 
 static char char_lookup[128] = { '\0' };
 
@@ -51,56 +51,34 @@ void __not_implemented__() {
 
 // Function skeletons for HW3
 void free_memory(prog_t *exe, prog_t *pipe) {
+	puts("freeing memory (free_memory not yet implemented)");
   // TODO - but not this time
 }
 
 int spawn(prog_t *exe, prog_t *pipe, int bgmode){
 
-	
-	char *cmd = "ls"; //ls command to be executing by child
-	char *argv[3];
-	argv[0] = "ls";
-	argv[1] = "-la";
-	argv[2] = NULL;
+	exe->args.args = super_realloc(exe->args.args, (exe->args.size + 1) * sizeof(char *) );
+	exe->args.args[exe->args.size] = NULL;
 
-	pid_t pid;
-	pid = fork();
-	if(pid < 0){ //General Forking
-		
-		fprintf(stderr, "Child Forking Process has Failed %d\n", errno); //If the Child Forking fails, exit 	
-		exit(EXIT_FAILURE);
+	pid_t result = fork();
+
+	if(result < 0) { //fork failed, parent process
+		perror("fork");
+		return 1;
 	}
-	else if (pid == 0){ //Child Process
-		
-		int j;
-		if (execvp(cmd, argv) < 0){ //When execvp fails, we call exit(0) and print out that it failed
-			printf("Error, exec failed\n");
-			exit(0);	
-		} 
-		for (j = 0; j < 1; j++){
-			execvp(cmd, argv);
-			perror("Fork Error");		
-		}
-		
-		_exit(0);
+
+	else if(result == 0) { //child process
+		int status = execvp(exe->args.args[0], exe->args.args);
+
+		if(status < 0){
+			perror(exe->args.args[0]);
+			exit(0);
+
+		}		
 	}
-	else{ // Parent Process
-		
-		int i;
-		free_memory(exe, pipe); // Called Function (which is tested and works)
-		
-		
-		//perror("Error with Parent Fork"); //perror displays error with the Parent Process
-		
-		/*for (i = 0; i < 5; i++){
-			
-			printf("parent: %d\n", i); //Parent counting tester
-			sleep(1);
-			
-		}*/
-		
-			
-			
+
+	else { //parent process
+		free_memory(exe, pipe);
 	}
 
 	return 0;
@@ -111,7 +89,7 @@ void *super_malloc(size_t size) {
 	void *ptr = malloc(size);
 	if(ptr == NULL) { abort(); }	
 
-  return ptr; // TODO
+  return ptr;
 }
 
 void *super_realloc(void *ptr, size_t size) {
@@ -119,7 +97,7 @@ void *super_realloc(void *ptr, size_t size) {
 	ptr = realloc(ptr, size);
 	if(ptr == NULL) { abort(); }
 
-  return ptr; // TODO
+  return ptr;
 }
 
 char *super_strdup(char *ptr) {

@@ -14,6 +14,7 @@ char *sushi_read_line(FILE *in) {
 	char *result;
 	char *tok;
 	int is_blank = 1;
+		
 
 	if( (fgets(buffer, sizeof(buffer), in) == NULL) && (!feof(in)) ) { 
 		perror("fgets");
