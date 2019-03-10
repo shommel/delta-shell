@@ -41,7 +41,7 @@ typedef struct prog {
 } prog_t;
 
 // Start a new program
-int spawn(prog_t *exe, prog_t *pipe, int bgmode);
+int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode);
 
 // Report unimplemented functions
 void __not_implemented__();
@@ -51,4 +51,7 @@ void __not_implemented__();
 void *super_malloc(size_t size);
 void *super_realloc(void *ptr, size_t size);
 char *super_strdup(char *ptr);
+
+void sushi_assign(char *name, char *value);
+char *sushi_safe_getenv(char *name);
 #endif

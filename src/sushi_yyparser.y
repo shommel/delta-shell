@@ -38,9 +38,9 @@
 
 cmdline: 
                        { /* an empty line is valid, too! Do nothing */ }
-| redir_exe bg_mode    { spawn($1, NULL, $2); }
-| in_exe pipe bg_mode  { spawn($1, $2, $3); }
-| arg YY_SUSHI_SET arg { __not_implemented__(); } /* TODO */
+| redir_exe bg_mode    { sushi_spawn($1, NULL, $2); }
+| in_exe pipe bg_mode  { sushi_spawn($1, $2, $3); }
+| arg YY_SUSHI_SET arg { sushi_assign($1, $3); }
 | YY_SUSHI_JOBS        { __not_implemented__(); } /* TODO */
 | YY_SUSHI_PWD         { __not_implemented__(); } /* TODO */
 | YY_SUSHI_CD arg      { __not_implemented__(); } /* TODO */
@@ -82,7 +82,7 @@ out2_redir: YY_SUSHI_MOREMORE arg { $$.out2 = $2; $$.in = $$.out1 = NULL; }
 
 bg_mode: 
                { $$ = 0; }
-| YY_SUSHI_AMP { $$ = 1; __not_implemented__(); }
+| YY_SUSHI_AMP { $$ = 1; }
 
 exe: 
 args {

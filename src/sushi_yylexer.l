@@ -25,7 +25,7 @@ jobs            { return YY_SUSHI_JOBS; }
 pwd             { return YY_SUSHI_PWD;  }
 cd              { return YY_SUSHI_CD;   }
 
-\${alnum}+      { yylval.s = super_strdup(getenv(yytext + 1));
+\${alnum}+      { yylval.s = super_strdup(sushi_safe_getenv(yytext + 1));
                   return YY_SUSHI_TOK; }
 {permitted}+    { yylval.s = super_strdup(sushi_unquote(yytext));
                   return YY_SUSHI_TOK; }
@@ -58,9 +58,6 @@ cd              { return YY_SUSHI_CD;   }
 int sushi_parse_command(char *command) {
   YY_BUFFER_STATE buffer = yy_scan_string(command);
   int retval = yyparse();
-  yy_delete_buffer(buffer);
+  yylex_destroy();
   return retval;
-
 }
-
-
