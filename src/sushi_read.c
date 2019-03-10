@@ -59,6 +59,8 @@ int sushi_read_config(char *fname) {
 	FILE *fpIN;
 	if( (fpIN = fopen(fname, "r")) ==  NULL){
 		//It's OK if the file does not exist!
+	  // DZ: But you are notchecking if it exists or no
+	  // DZ: You are checking if it is readable
 		perror(fname);
 	}
 	

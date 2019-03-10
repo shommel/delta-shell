@@ -53,6 +53,7 @@ void __not_implemented__() {
 
 // Function skeletons for HW3
 void free_memory(prog_t *exe, prog_t *pipe) {
+  // DZ: to stderr
 	puts("freeing memory (free_memory not yet implemented)");
   // TODO - but not this time
 }
