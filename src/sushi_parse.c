@@ -48,13 +48,43 @@ void yyerror(const char* s) {
 }
 
 void __not_implemented__() {  
-  fputs("This operation is not implemented yet\n", stderr);
+  fprintf(stderr, "%s\n", "This operation is not implemented yet");
+
 }
 
-// Function skeletons for HW3
 void free_memory(prog_t *exe, prog_t *pipe) {
-	puts("freeing memory (free_memory not yet implemented)");
-  // TODO - but not this time
+
+	for(size_t i = 0; i < sizeof(exe->args.args)/sizeof(exe->args.args[0]); i++){
+		if(exe->args.args[i] != NULL){
+			free(exe->args.args[i]);
+		}
+	}
+
+	free(exe->args.args);
+
+  	//free each non-NULL exe->redirection
+	if(exe->redirection.in != NULL){
+		puts("free in");
+		free(exe->redirection.in);
+	}
+
+	if(exe->redirection.out1 != NULL){
+		puts("free out1");
+
+		free(exe->redirection.out1);
+	}
+
+	if(exe->redirection.out2 != NULL){
+		puts("free out2");
+
+		free(exe->redirection.out2);
+	}
+
+	free(exe);
+
+	if(pipe != NULL){
+		free(pipe);
+	}
 }
 
 // Skeleton
@@ -112,8 +142,6 @@ void *super_realloc(void *ptr, size_t size) {
 
 char *super_strdup(char *ptr) {
 	char *ptr2 = strdup(ptr);
-	//puts(ptr2);
-	//printf("%zu\n", strlen(ptr));
 	if(ptr2 == NULL) { abort(); }
 
 	return ptr2;

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -57,9 +58,15 @@ char *sushi_read_line(FILE *in) {
 int sushi_read_config(char *fname) {
 
 	FILE *fpIN;
-	if( (fpIN = fopen(fname, "r")) ==  NULL){
-		//It's OK if the file does not exist!
+
+	if( access(fname, F_OK) == -1 ){ //tests if file exists
+		//It's OK if the file does not exist! Do not return 
 		perror(fname);
+	}
+
+	if( (fpIN = fopen(fname, "r")) ==  NULL){ //tests if file can be opened
+		perror(fname); 
+		return 1; //not okay if file cannot be opened!
 	}
 	
 	char *line;
@@ -73,7 +80,7 @@ int sushi_read_config(char *fname) {
 	}
 
 	if( (result =  fclose(fpIN)) != 0){
-		perror(fname);
+		perror(fname); //not okay if file cannot be closed!
 		return 1;
 	}
 
