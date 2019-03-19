@@ -94,15 +94,20 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 
 /// Skeleton
 void sushi_assign(char *name, char *value) {
+	printf("Name = %s\n", name);
+	printf("Value = %s\n", value);
+
 	setenv(name, value, 1);
+
 	free(value);
 	free(name);
 }
 
 // Skeleton
 char *sushi_safe_getenv(char *name) {
-	if(getenv(name) != NULL){
-		return name;
+	char *result;
+	if( (result = getenv(name)) != NULL) {
+		return result;
 	}
   return ""; // DZ: change it!
 }
