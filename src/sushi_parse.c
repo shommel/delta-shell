@@ -2,6 +2,8 @@
 #include <errno.h>
 #include "sushi.h"
 #include "sushi_yyparser.tab.h"
+#include <sys/wait.h>
+#include <sys/types.h>
 
 static char char_lookup[128] = { '\0' };
 
@@ -97,11 +99,13 @@ char *sushi_safe_getenv(char *name) {
 }
 
 int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
-
+	
 	exe->args.args = super_realloc(exe->args.args, (exe->args.size + 1) * sizeof(char *) );
 	exe->args.args[exe->args.size] = NULL; //the form that execvp expects
 
 	pid_t result = fork();
+	//int status = execvp(exe->args.args[0], exe->args.args);
+	pid_t pid;
 
 	if(result < 0) { //fork failed, parent process
 		perror("fork");
@@ -118,7 +122,25 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
 	}
 
 	else { //parent process
-		free_memory(exe, pipe);
+		if(bgmode == 1){
+			return 0;
+		}
+		else if(bgmode == 0){
+			free_memory(exe, pipe); //Free Memory
+			/*if ((pid = pid_t waitpid(result, status, WNOHANG)) == -1){ //Wait for Child
+				perror("wait error");
+			}
+			
+
+			if (WIFEXITED(status)){
+				printf("Child terminates %d with status %d \n", ppid,WEXITSTATUS(status));
+
+			}
+			else{
+				return 0;
+			}*/
+		//setenv(const char , const char , int ); //Have to get value from Part 1 
+		}
 	}
 
 	return 0;
