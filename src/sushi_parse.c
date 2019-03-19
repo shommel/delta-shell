@@ -1,5 +1,8 @@
 #include <string.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "sushi.h"
 #include "sushi_yyparser.tab.h"
 #include <sys/wait.h>
@@ -84,18 +87,24 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 
 	free(exe);
 
-	if(pipe != NULL){
-		free(pipe);
-	}
+	// if(pipe != NULL){
+	// 	free(pipe);
+	// }
 }
 
-// Skeleton
+/// Skeleton
 void sushi_assign(char *name, char *value) {
+	setenv(name, value, 1);
+	free(value);
+	free(name);
 }
 
 // Skeleton
 char *sushi_safe_getenv(char *name) {
-  return NULL; // DZ: change it!
+	if(getenv(name) != NULL){
+		return name;
+	}
+  return ""; // DZ: change it!
 }
 
 int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
@@ -104,8 +113,7 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
 	exe->args.args[exe->args.size] = NULL; //the form that execvp expects
 
 	pid_t result = fork();
-	//int status = execvp(exe->args.args[0], exe->args.args);
-	pid_t pid;
+	//pid_t pid;
 
 	if(result < 0) { //fork failed, parent process
 		perror("fork");
@@ -126,20 +134,26 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
 			return 0;
 		}
 		else if(bgmode == 0){
+			int child_status;
+
 			free_memory(exe, pipe); //Free Memory
-			/*if ((pid = pid_t waitpid(result, status, WNOHANG)) == -1){ //Wait for Child
-				perror("wait error");
-			}
-			
 
-			if (WIFEXITED(status)){
-				printf("Child terminates %d with status %d \n", ppid,WEXITSTATUS(status));
+			pid_t w = waitpid(result, &child_status, 0);
+			// puts("child status");
+			// printf("%d\n", child_status);
 
-			}
-			else{
-				return 0;
-			}*/
-		//setenv(const char , const char , int ); //Have to get value from Part 1 
+			//convert child_status to string
+			char status_string[ ( sizeof(child_status) / sizeof(int) ) + 1];
+
+			sprintf(status_string, "%d", child_status);
+			//itoa(child_status, status_string, 10);
+
+			// puts("status string");
+			// puts(status_string);
+
+
+			setenv("_", status_string, 1);
+			//free(status_string);
 		}
 	}
 
