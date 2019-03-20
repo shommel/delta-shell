@@ -10,6 +10,26 @@
 
 static char char_lookup[128] = { '\0' };
 
+int count_digits(int n){
+	if(n == 0){
+		return 1;
+	}
+
+	else{
+		int count = 0;
+
+    	while(n != 0){
+    		count++;
+
+    		n /= 10;
+
+    	}
+    	return count;
+    }
+    
+}
+
+
 void char_lookup_setup(){
 	//changes the char_lookup table with alloc necessary escape sequences
 
@@ -29,6 +49,7 @@ void char_lookup_setup(){
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char * s) {
 
+	size_t new_size;
 	//i is reader pointer, j is writer pointer
 	for(size_t i = 0, j = 0; i < strlen(s); i++, j++){
 
@@ -41,7 +62,12 @@ char *sushi_unquote(char * s) {
 			s[j] = s[i];
 		}
 
+		new_size = j;
+
 	}
+
+	//s = super_realloc(s, new_size+1);
+	//s[new_size] = '\0';
 
   return s;
 }
@@ -148,7 +174,12 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
 			// printf("%d\n", child_status);
 
 			//convert child_status to string
-			char status_string[ ( sizeof(child_status) / sizeof(int) ) + 1];
+			char status_string[ count_digits(child_status) + 1];
+
+			// printf("%d\n", child_status);
+			// printf("%zu\n", sizeof(child_status));
+			// printf("%zu\n", sizeof(int));
+
 
 			sprintf(status_string, "%d", child_status);
 			//itoa(child_status, status_string, 10);
