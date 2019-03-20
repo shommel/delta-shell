@@ -49,9 +49,9 @@ void char_lookup_setup(){
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char * s) {
 
-	size_t new_size;
+	size_t j = 0;
 	//i is reader pointer, j is writer pointer
-	for(size_t i = 0, j = 0; i < strlen(s); i++, j++){
+	for(size_t i = 0; i < strlen(s); i++, j++){
 
 		if( (s[i] == '\\') && (char_lookup[ (int) s[i+1]] != '\0') ){
 			s[j] = char_lookup[ (int) s[i+1]];
@@ -62,13 +62,12 @@ char *sushi_unquote(char * s) {
 			s[j] = s[i];
 		}
 
-		new_size = j;
-
 	}
 
 	//s = super_realloc(s, new_size+1);
-	//s[new_size] = '\0';
+	s[j] = '\0';
 
+//printf("[%s]\n", s);
   return s;
 }
 

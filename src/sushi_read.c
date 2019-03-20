@@ -39,9 +39,11 @@ char *sushi_read_line(FILE *in) {
 		return NULL;
 	}
 
+	result = tok;
+/*
 	result = super_malloc( strlen(tok) + 1);
 	strcpy(result, tok);
-
+*/
 	if(strlen(buffer) == SUSHI_MAX_INPUT){ //enter only when line is longer than max
 		fprintf(stderr, "%s\n", "Line too long, truncated");
 		char *remainder; //variable for cleaning up rest of line
@@ -62,6 +64,7 @@ int sushi_read_config(char *fname) {
 	if( access(fname, F_OK) == -1 ){ //tests if file exists
 		//It's OK if the file does not exist! Do not return 
 		perror(fname);
+		return 0;
 	}
 
 	if( (fpIN = fopen(fname, "r")) ==  NULL){ //tests if file can be opened
