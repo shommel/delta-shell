@@ -49,6 +49,9 @@ void char_lookup_setup(){
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char * s) {
 
+	//return s;
+
+
 	size_t j = 0;
 	//i is reader pointer, j is writer pointer
 	for(size_t i = 0; i < strlen(s); i++, j++){

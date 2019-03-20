@@ -39,7 +39,7 @@ char *sushi_read_line(FILE *in) {
 		return NULL;
 	}
 
-	result = tok;
+	result = super_strdup(tok);
 /*
 	result = super_malloc( strlen(tok) + 1);
 	strcpy(result, tok);
