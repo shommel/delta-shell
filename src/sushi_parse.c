@@ -11,6 +11,7 @@
 static char char_lookup[128] = { '\0' };
 
 int count_digits(int n){
+
 	if(n == 0){
 		return 1;
 	}
@@ -26,7 +27,7 @@ int count_digits(int n){
     	}
     	return count;
     }
-    
+
 }
 
 
@@ -49,9 +50,6 @@ void char_lookup_setup(){
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char * s) {
 
-	//return s;
-
-
 	size_t j = 0;
 	//i is reader pointer, j is writer pointer
 	for(size_t i = 0; i < strlen(s); i++, j++){
@@ -67,10 +65,8 @@ char *sushi_unquote(char * s) {
 
 	}
 
-	//s = super_realloc(s, new_size+1);
-	s[j] = '\0';
+	s[j] = '\0'; //putting a null-term zero at the end of the writer pointer (end of new string)
 
-//printf("[%s]\n", s);
   return s;
 }
 
@@ -80,7 +76,7 @@ void yyerror(const char* s) {
   fprintf(stderr, "Parse error: %s\n", s);
 }
 
-void __not_implemented__() {  
+void __not_implemented__() {
   fprintf(stderr, "%s\n", "This operation is not implemented yet");
 
 }
@@ -114,19 +110,19 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 	}
 
 	free(exe);
+/*
+	 if(pipe != NULL){
+		puts("here");
+	 	free(pipe);
+	}
+*/
 
-	// if(pipe != NULL){
-	// 	free(pipe);
-	// }
 }
 
 /// Skeleton
 void sushi_assign(char *name, char *value) {
-	printf("Name = %s\n", name);
-	printf("Value = %s\n", value);
 
 	setenv(name, value, 1);
-
 	free(value);
 	free(name);
 }
@@ -141,12 +137,11 @@ char *sushi_safe_getenv(char *name) {
 }
 
 int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
-	
+
 	exe->args.args = super_realloc(exe->args.args, (exe->args.size + 1) * sizeof(char *) );
 	exe->args.args[exe->args.size] = NULL; //the form that execvp expects
 
 	pid_t result = fork();
-	//pid_t pid;
 
 	if(result < 0) { //fork failed, parent process
 		perror("fork");
@@ -159,7 +154,7 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
 		if(status < 0){
 			perror(exe->args.args[0]);
 			exit(0);
-		}		
+		}
 	}
 
 	else { //parent process
@@ -172,26 +167,13 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
 			free_memory(exe, pipe); //Free Memory
 
 			pid_t w = waitpid(result, &child_status, 0);
-			// puts("child status");
-			// printf("%d\n", child_status);
 
 			//convert child_status to string
 			char status_string[ count_digits(child_status) + 1];
-
-			// printf("%d\n", child_status);
-			// printf("%zu\n", sizeof(child_status));
-			// printf("%zu\n", sizeof(int));
-
-
 			sprintf(status_string, "%d", child_status);
-			//itoa(child_status, status_string, 10);
-
-			// puts("status string");
-			// puts(status_string);
-
 
 			setenv("_", status_string, 1);
-			//free(status_string);
+
 		}
 	}
 
@@ -201,13 +183,13 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode){
 void *super_malloc(size_t size) {
 
 	void *ptr = malloc(size);
-	if(ptr == NULL) { abort(); }	
+	if(ptr == NULL) { abort(); }
 
   return ptr;
 }
 
 void *super_realloc(void *ptr, size_t size) {
-	
+
 	ptr = realloc(ptr, size);
 	if(ptr == NULL) { abort(); }
 

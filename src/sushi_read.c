@@ -6,7 +6,7 @@
 #include <errno.h>
 #include "sushi.h"
 
-#define SEP "\n" 
+#define SEP "\n"
 #define SEP_CODE 10
 
 char *sushi_read_line(FILE *in) {
@@ -15,9 +15,9 @@ char *sushi_read_line(FILE *in) {
 	char *result;
 	char *tok;
 	int is_blank = 1;
-		
 
-	if( (fgets(buffer, sizeof(buffer), in) == NULL) && (!feof(in)) ) { 
+
+	if( (fgets(buffer, sizeof(buffer), in) == NULL) && (!feof(in)) ) {
 		perror("fgets");
 		return NULL;
 	}
@@ -40,10 +40,7 @@ char *sushi_read_line(FILE *in) {
 	}
 
 	result = super_strdup(tok);
-/*
-	result = super_malloc( strlen(tok) + 1);
-	strcpy(result, tok);
-*/
+
 	if(strlen(buffer) == SUSHI_MAX_INPUT){ //enter only when line is longer than max
 		fprintf(stderr, "%s\n", "Line too long, truncated");
 		char *remainder; //variable for cleaning up rest of line
@@ -62,19 +59,18 @@ int sushi_read_config(char *fname) {
 	FILE *fpIN;
 
 	if( access(fname, F_OK) == -1 ){ //tests if file exists
-		//It's OK if the file does not exist! Do not return 
-		perror(fname);
+		//It's OK if the file does not exist! Do not return
 		return 0;
 	}
 
 	if( (fpIN = fopen(fname, "r")) ==  NULL){ //tests if file can be opened
-		perror(fname); 
+		perror(fname);
 		return 1; //not okay if file cannot be opened!
 	}
-	
+
 	char *line;
 	int result;
-	while( !feof(fpIN) ){ 
+	while( !feof(fpIN) ){
 		if( (line = sushi_read_line(fpIN)) != NULL){
 			if( (result = sushi_parse_command(line)) == 0 ){
 				sushi_store(line);
