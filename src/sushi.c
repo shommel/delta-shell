@@ -9,8 +9,9 @@ int sushi_exit = 0;
 
 static void refuse_to_die(int sig)
 {
-	if(sig == SIGINT){ 	
+	if(sig == SIGINT){
 		fprintf(stderr, "\n%s\n%s", "Type exit to exit the shell", SUSHI_DEFAULT_PROMPT);
+
 	}
 }
 
@@ -22,7 +23,7 @@ static void prevent_interruption() {
     action.sa_handler = refuse_to_die;
 
     //to solve the fgets: Interrupted system call error from 18 in sushi_read.c
-    action.sa_flags = SA_RESTART; 
+    action.sa_flags = SA_RESTART;
 
     sigemptyset(&action.sa_mask);
     sigaddset(&action.sa_mask, SIGINT);

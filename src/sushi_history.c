@@ -10,8 +10,8 @@ void sushi_store(char *line) {
 	if(line == NULL){
 		return;
 	}
-	
-	if(history[SUSHI_HISTORY_LENGTH-1] == NULL){ 
+
+	if(history[SUSHI_HISTORY_LENGTH-1] == NULL){
 		free(history[SUSHI_HISTORY_LENGTH-1]);
 	}
 

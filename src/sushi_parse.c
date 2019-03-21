@@ -30,7 +30,6 @@ int count_digits(int n){
 
 }
 
-
 void char_lookup_setup(){
 	//changes the char_lookup table with alloc necessary escape sequences
 
@@ -93,29 +92,23 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 
   	//free each non-NULL exe->redirection
 	if(exe->redirection.in != NULL){
-		puts("free in");
 		free(exe->redirection.in);
 	}
 
 	if(exe->redirection.out1 != NULL){
-		puts("free out1");
-
 		free(exe->redirection.out1);
 	}
 
 	if(exe->redirection.out2 != NULL){
-		puts("free out2");
-
 		free(exe->redirection.out2);
 	}
 
 	free(exe);
-/*
+
 	 if(pipe != NULL){
 		puts("here");
 	 	free(pipe);
 	}
-*/
 
 }
 
