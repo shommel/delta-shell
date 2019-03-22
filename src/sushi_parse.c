@@ -10,6 +10,7 @@
 
 static char char_lookup[128] = { '\0' };
 
+// DZ: how about int(log10(n))+1 ?
 int count_digits(int n){
 
 	if(n == 0){
@@ -105,6 +106,7 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 
 	free(exe);
 
+	// DZ: This is probably an error on my side; disregard it
 	 if(pipe != NULL){
 		puts("here");
 	 	free(pipe);
@@ -114,7 +116,7 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 
 /// Skeleton
 void sushi_assign(char *name, char *value) {
-
+  // DZ: The returned value must be checked
 	setenv(name, value, 1);
 	free(value);
 	free(name);
