@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "sushi.h"
 #include "sushi_yyparser.tab.h"
@@ -16,17 +17,7 @@ int count_digits(int n){
 		return 1;
 	}
 
-	else{
-		int count = 0;
-
-    	while(n != 0){
-    		count++;
-
-    		n /= 10;
-
-    	}
-    	return count;
-    }
+	return (int)log10(n) + 1;
 
 }
 
@@ -81,36 +72,44 @@ void __not_implemented__() {
 }
 
 void free_memory(prog_t *exe) {
+	prog_t *tmp;
 
-	for(size_t i = 0; i < sizeof(exe->args.args)/sizeof(exe->args.args[0]); i++){
-		if(exe->args.args[i] != NULL){
-			free(exe->args.args[i]);
+	while( exe != NULL){ //will loop backwards until it reaches first arugment on 
+						 //command line's prev (which is NULL)
+		for(size_t i = 0; i < sizeof(exe->args.args)/sizeof(exe->args.args[0]); i++){
+			if(exe->args.args[i] != NULL){
+				free(exe->args.args[i]);
+			}
 		}
+
+		free(exe->args.args);
+
+	  	//free each non-NULL exe->redirection
+		if(exe->redirection.in != NULL){
+			free(exe->redirection.in);
+		}
+
+		if(exe->redirection.out1 != NULL){
+			free(exe->redirection.out1);
+		}
+
+		if(exe->redirection.out2 != NULL){
+			free(exe->redirection.out2);
+		}
+
+		tmp = exe;
+		exe = exe->prev;
+		free(tmp);
 	}
-
-	free(exe->args.args);
-
-  	//free each non-NULL exe->redirection
-	if(exe->redirection.in != NULL){
-		free(exe->redirection.in);
-	}
-
-	if(exe->redirection.out1 != NULL){
-		free(exe->redirection.out1);
-	}
-
-	if(exe->redirection.out2 != NULL){
-		free(exe->redirection.out2);
-	}
-
-	free(exe);
-
 }
 
 /// Skeleton
 void sushi_assign(char *name, char *value) {
-
-	setenv(name, value, 1);
+	int result;
+	if( (result = setenv(name, value, 1)) != 0){
+		perror("setenv");
+	}
+	
 	free(value);
 	free(name);
 }
@@ -204,9 +203,11 @@ int sushi_spawn(prog_t *exe, int bgmode){
 	}
 
 	else { //parent process
+
 		if(bgmode == 1){
 			return 0;
 		}
+
 		else if(bgmode == 0){
 			int child_status;
 

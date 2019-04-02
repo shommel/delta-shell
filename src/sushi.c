@@ -31,7 +31,12 @@ static void prevent_interruption() {
     sigaction(SIGINT, &action, NULL);
 }
 
-int main() {
+int main(int argc, char const *argv[]) {
+
+	int setenv_result;
+	if( (setenv_result = setenv("SHELL", argv[0], 1) ) != 0){
+		perror("setenv");
+	}
 
 	char_lookup_setup(); //initialize char_lookup table
 
@@ -40,17 +45,36 @@ int main() {
 	strcat(path,"/sushi.conf");
 
 	int result;
-	if( (result = sushi_read_config(path)) == 1){
+	if( (result = sushi_read_config(path, 1)) == 1){
 		return EXIT_FAILURE;
 	}
+
 	free(path);
+
+	if(argc > 1){
+		char *arg_tmp;
+		for(int i = 1; i < argc; i++){
+			arg_tmp = super_strdup(argv[i]);
+			sushi_read_config(arg_tmp, 0);
+			free(arg_tmp);
+		}
+	}
 
 	prevent_interruption();
 
 	char *line;
+	char *prompt;
 	int i = 0;
 	while(sushi_exit == 0){ //until user types "exit"
-		printf("%s", SUSHI_DEFAULT_PROMPT);
+
+		if((prompt = getenv("PS1")) == NULL){
+			printf("%s", SUSHI_DEFAULT_PROMPT);
+		}
+
+		else{
+			printf("%s", prompt);
+		}
+		
 
 		if( (line = sushi_read_line(stdin)) != NULL){
 			if( (result = sushi_parse_command(line)) == 0 ){

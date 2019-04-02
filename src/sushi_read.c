@@ -11,6 +11,7 @@
 
 char *sushi_read_line(FILE *in) {
 
+
 	char buffer[SUSHI_MAX_INPUT+1]; //+1 for the terminating zero
 	char *result;
 	char *tok;
@@ -21,6 +22,7 @@ char *sushi_read_line(FILE *in) {
 		perror("fgets");
 		return NULL;
 	}
+
 
 	tok = strtok(buffer, SEP); //seperate by newline
 
@@ -54,19 +56,19 @@ char *sushi_read_line(FILE *in) {
   return result;
 }
 
-int sushi_read_config(char *fname) {
+int sushi_read_config(char *fname, int ok_if_missing) {
 
 	FILE *fpIN;
 
-	if( access(fname, F_OK) == -1 ){ //tests if file exists
-		//It's OK if the file does not exist! Do not return
-		return 0;
+	if( ((fpIN = fopen(fname, "r")) ==  NULL) && (ok_if_missing == 0) ){ //tests if file can be opened
+		perror(fname);
+		exit(1); //not okay if file cannot be opened!
 	}
 
-	if( (fpIN = fopen(fname, "r")) ==  NULL){ //tests if file can be opened
-		perror(fname);
-		return 1; //not okay if file cannot be opened!
-	}
+	if( (access(fname, F_OK) == -1)){ //tests if file exists
+			//It's OK if the file does not exist! Do not return
+			return 0;
+		}
 
 	char *line;
 	int result;
