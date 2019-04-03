@@ -3,22 +3,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
 #include "sushi.h"
 #include "sushi_yyparser.tab.h"
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 static char char_lookup[128] = { '\0' };
 
-int count_digits(int n){
-
+/*int count_digits(int n){ What I pulled from Spencer
 	if(n == 0){
 		return 1;
 	}
-
 	return (int)log10(n) + 1;
+}*/
 
+int count_digits(int n){ //Initially Had
+	if(n == 0){
+		return 1;
+	}
+	else{
+		int count = 0;
+    	while(n != 0){
+    		count++;
+    		n /= 10;
+    	}
+	return count;
+    }
 }
 
 void char_lookup_setup(){
@@ -182,15 +193,16 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 int sushi_spawn(prog_t *exe, int bgmode){
 
-	int fd1[2];
+	int pipe1[2];//Set up Pipes
+	int pipe2[2];
 	int i;
 
-
+	
 	exe->args.args = super_realloc(exe->args.args, (exe->args.size + 1) * sizeof(char *) );
 	exe->args.args[exe->args.size] = NULL; //the form that execvp expects
-
-	pipe(fd1);
 	
+	pipe(pipe1);
+	pipe(pipe2);
 	pid_t result = fork();
 	
 	//exe->prev; Brings back commands from previous list
@@ -202,48 +214,16 @@ int sushi_spawn(prog_t *exe, int bgmode){
 
 	else if(result == 0) { //child process
 	
-		/*//dup2(fd1[1], stdout);
-		close(fd1[2 * i]);//read
-		close(fd1[2 * i + 1]);//write
-		execlp(exe, exe, exe->prev, (char*) NULL);
-		perror("First Child Pipe Issue");*/
+		dup2(pipe1[0], STDOUT_FILENO); //Connects Pipes together from Write end and then closes each
+		close(pipe1[0]);
+		close(pipe1[1]);
+		//execlp("ls", "ps", NULL); Some testing
 
-		if(result < 0){
-			perror(exe->args.args[0]);
-			exit(0);
-		}
-	
+		dup2(pipe2[1], STDIN_FILENO); //Connects Pipes together from Read end and then closes each
+		close(pipe2[1]);
+		close(pipe2[0]);
 		
-		
-		/*int n;
-		int i;
-		int position_of_pipes = 0;
-		int fd[2];
 
-		pid_t child_pid;
-		read(child_pid, exe->prev, (strlen(exe->prev);
-		pipe(fd[2]); //Will reverse later, Testing forward piping now
-		
-		if (n <= -1){//Pipe Code Starts
-			perror("Pipes issues\n");
-			return 0;
-		}
-		
-		if((int) (child_pid = fork()) < 0) {//Children
-			perror("First Child Fork Error\n");
-			return 0;
-		}
-		else if((int) child_pid == 0) {
-			close(fd[0]);
-			//while (read(pipes[0], &buff, 1) > 0)
-			write(fd[1], *exe, strlen(exe)+1);
-			close(fd[1]);
-			dup2(pipe_position + 1, 1);	
-	
-			execvp(exe->prev, exe->args.args[0]);
-			perror("Arguements Error\n");	
-			return 0;
-		}*/
 		if(result < 0){
 			perror(exe->args.args[0]);
 			exit(0);
@@ -258,8 +238,6 @@ int sushi_spawn(prog_t *exe, int bgmode){
 		}
 		else if(bgmode == 0){
 			int child_status;
-			close(fd1[0]); //Read End For Normal Pipe
-			close(fd1[1]);//Write End
 			free_memory(exe); //Free Memory
 
 			pid_t w = waitpid(result, &child_status, 0);
@@ -276,6 +254,7 @@ int sushi_spawn(prog_t *exe, int bgmode){
 	}
 	return 0;
 }
+
 
 
 void *super_malloc(size_t size) {
