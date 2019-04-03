@@ -180,13 +180,20 @@ static void dup_me (int new, int old) {
 /*--------------------------------------------------------------------
  * End of "convenience" functions
  *--------------------------------------------------------------------*/
-
 int sushi_spawn(prog_t *exe, int bgmode){
+
+	int fd1[2];
+	int i;
+
 
 	exe->args.args = super_realloc(exe->args.args, (exe->args.size + 1) * sizeof(char *) );
 	exe->args.args[exe->args.size] = NULL; //the form that execvp expects
 
+	pipe(fd1);
+	
 	pid_t result = fork();
+	
+	//exe->prev; Brings back commands from previous list
 
 	if(result < 0) { //fork failed, parent process
 		perror("fork");
@@ -194,12 +201,54 @@ int sushi_spawn(prog_t *exe, int bgmode){
 	}
 
 	else if(result == 0) { //child process
-		int status = execvp(exe->args.args[0], exe->args.args);
+	
+		/*//dup2(fd1[1], stdout);
+		close(fd1[2 * i]);//read
+		close(fd1[2 * i + 1]);//write
+		execlp(exe, exe, exe->prev, (char*) NULL);
+		perror("First Child Pipe Issue");*/
 
-		if(status < 0){
+		if(result < 0){
 			perror(exe->args.args[0]);
 			exit(0);
 		}
+	
+		
+		
+		/*int n;
+		int i;
+		int position_of_pipes = 0;
+		int fd[2];
+
+		pid_t child_pid;
+		read(child_pid, exe->prev, (strlen(exe->prev);
+		pipe(fd[2]); //Will reverse later, Testing forward piping now
+		
+		if (n <= -1){//Pipe Code Starts
+			perror("Pipes issues\n");
+			return 0;
+		}
+		
+		if((int) (child_pid = fork()) < 0) {//Children
+			perror("First Child Fork Error\n");
+			return 0;
+		}
+		else if((int) child_pid == 0) {
+			close(fd[0]);
+			//while (read(pipes[0], &buff, 1) > 0)
+			write(fd[1], *exe, strlen(exe)+1);
+			close(fd[1]);
+			dup2(pipe_position + 1, 1);	
+	
+			execvp(exe->prev, exe->args.args[0]);
+			perror("Arguements Error\n");	
+			return 0;
+		}*/
+		if(result < 0){
+			perror(exe->args.args[0]);
+			exit(0);
+		}
+		
 	}
 
 	else { //parent process
@@ -207,13 +256,14 @@ int sushi_spawn(prog_t *exe, int bgmode){
 		if(bgmode == 1){
 			return 0;
 		}
-
 		else if(bgmode == 0){
 			int child_status;
-
+			close(fd1[0]); //Read End For Normal Pipe
+			close(fd1[1]);//Write End
 			free_memory(exe); //Free Memory
 
 			pid_t w = waitpid(result, &child_status, 0);
+			
 
 			//convert child_status to string
 			char status_string[ count_digits(child_status) + 1];
@@ -222,10 +272,11 @@ int sushi_spawn(prog_t *exe, int bgmode){
 			setenv("_", status_string, 1);
 
 		}
+	
 	}
-
 	return 0;
 }
+
 
 void *super_malloc(size_t size) {
 
