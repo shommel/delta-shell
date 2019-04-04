@@ -3,34 +3,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
 #include "sushi.h"
 #include "sushi_yyparser.tab.h"
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 static char char_lookup[128] = { '\0' };
-
-/*int count_digits(int n){ What I pulled from Spencer
-	if(n == 0){
-		return 1;
-	}
-	return (int)log10(n) + 1;
-}*/
-
-int count_digits(int n){ //Initially Had
-	if(n == 0){
-		return 1;
-	}
+int count_digits(int n){
+	if(n==0){
+		return 1;	
+	}	
 	else{
 		int count = 0;
-    	while(n != 0){
-    		count++;
-    		n /= 10;
-    	}
-	return count;
-    }
+		while(n != 0){
+			count++;
+			n /= 10;
+		}
+		return count;	
+	}
+	
 }
+
+/*int count_digits(int n){
+
+	if(n == 0){
+		return 1;
+	}
+
+	return (int)log10(n) + 1;
+
+}*/
+
 
 void char_lookup_setup(){
 	//changes the char_lookup table with alloc necessary escape sequences
@@ -191,21 +195,25 @@ static void dup_me (int new, int old) {
 /*--------------------------------------------------------------------
  * End of "convenience" functions
  *--------------------------------------------------------------------*/
+
 int sushi_spawn(prog_t *exe, int bgmode){
+	int counter = 0;
+	int i = 0;
+	while((exe->prev) != NULL){
+		counter++;
+	}
+	printf("%d",counter); //Dz's counter 
 
-	int pipe1[2];//Set up Pipes
-	int pipe2[2];
-	int i;
-
-	
 	exe->args.args = super_realloc(exe->args.args, (exe->args.size + 1) * sizeof(char *) );
 	exe->args.args[exe->args.size] = NULL; //the form that execvp expects
-	
+
+
+	int pipe1[2];
+	int pipe2[2];
+
 	pipe(pipe1);
 	pipe(pipe2);
 	pid_t result = fork();
-	
-	//exe->prev; Brings back commands from previous list
 
 	if(result < 0) { //fork failed, parent process
 		perror("fork");
@@ -213,35 +221,34 @@ int sushi_spawn(prog_t *exe, int bgmode){
 	}
 
 	else if(result == 0) { //child process
-	
-		dup2(pipe1[0], STDOUT_FILENO); //Connects Pipes together from Write end and then closes each
-		close(pipe1[0]);
-		close(pipe1[1]);
-		//execlp("ls", "ps", NULL); Some testing
-
-		dup2(pipe2[1], STDIN_FILENO); //Connects Pipes together from Read end and then closes each
-		close(pipe2[1]);
-		close(pipe2[0]);
+		int status = execvp(exe->args.args[0], exe->args.args);
 		
-
-		if(result < 0){
+		close(pipe1[1]);
+		dup2(pipe1[0], STDOUT_FILENO);
+		close(pipe1[0]);
+		
+		if(status < 0){
 			perror(exe->args.args[0]);
 			exit(0);
 		}
-		
 	}
 
 	else { //parent process
 
+		close(pipe2[0]);
+		dup2(pipe2[1], STDIN_FILENO);
+		close(pipe2[1]);
+
 		if(bgmode == 1){
 			return 0;
 		}
+
 		else if(bgmode == 0){
 			int child_status;
+
 			free_memory(exe); //Free Memory
 
 			pid_t w = waitpid(result, &child_status, 0);
-			
 
 			//convert child_status to string
 			char status_string[ count_digits(child_status) + 1];
@@ -250,12 +257,10 @@ int sushi_spawn(prog_t *exe, int bgmode){
 			setenv("_", status_string, 1);
 
 		}
-	
 	}
+
 	return 0;
 }
-
-
 
 void *super_malloc(size_t size) {
 
@@ -279,3 +284,6 @@ char *super_strdup(const char *ptr) {
 
 	return ptr2;
 }
+
+
+
