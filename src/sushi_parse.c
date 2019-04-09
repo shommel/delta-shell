@@ -10,31 +10,6 @@
 #include <sys/types.h>
 
 static char char_lookup[128] = { '\0' };
-int count_digits(int n){
-	if(n==0){
-		return 1;	
-	}	
-	else{
-		int count = 0;
-		while(n != 0){
-			count++;
-			n /= 10;
-		}
-		return count;	
-	}
-	
-}
-
-/*int count_digits(int n){
-
-	if(n == 0){
-		return 1;
-	}
-
-	return (int)log10(n) + 1;
-
-}*/
-
 
 void char_lookup_setup(){
 	//changes the char_lookup table with alloc necessary escape sequences
@@ -135,7 +110,7 @@ char *sushi_safe_getenv(char *name) {
 	if( (result = getenv(name)) != NULL) {
 		return result;
 	}
-  return ""; // DZ: change it!
+  return ""; 
 }
 
 /*------------------------------------------------------------------
@@ -197,22 +172,7 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode){
-	int counter = 0;
-	int i = 0;
-	while((exe->prev) != NULL){
-		counter++;
-	}
-	printf("%d",counter); //Dz's counter 
-
-	exe->args.args = super_realloc(exe->args.args, (exe->args.size + 1) * sizeof(char *) );
-	exe->args.args[exe->args.size] = NULL; //the form that execvp expects
-
-
-	int pipe1[2];
-	int pipe2[2];
-
-	pipe(pipe1);
-	pipe(pipe2);
+	
 	pid_t result = fork();
 
 	if(result < 0) { //fork failed, parent process
@@ -221,46 +181,110 @@ int sushi_spawn(prog_t *exe, int bgmode){
 	}
 
 	else if(result == 0) { //child process
-		int status = execvp(exe->args.args[0], exe->args.args);
-		
-		close(pipe1[1]);
-		dup2(pipe1[0], STDOUT_FILENO);
-		close(pipe1[0]);
-		
-		if(status < 0){
-			perror(exe->args.args[0]);
-			exit(0);
+		int myPipe[2];
+		int result_pipe = 0;
+
+		if( (result_pipe = pipe(myPipe)) == -1 ){ //creating pipe in process
+			perror("pipe");
+			return 1; 
 		}
+
+		pid_t result2 = fork();
+
+		if(result2 == result){ //child process
+			close(myPipe[1]); //closing write end of pipe
+			dup_me(myPipe[0], 0); //renaming stdin
+			start(exe);
+		}
+
+		else{ //grandchild
+			close(myPipe[0]); //closeing read end of pipe
+			dup_me(myPipe[1], 1); //renaming stdout 
+			start(exe->prev);
+
+		}
+
 	}
 
 	else { //parent process
 
-		close(pipe2[0]);
-		dup2(pipe2[1], STDIN_FILENO);
-		close(pipe2[1]);
 
 		if(bgmode == 1){
+			free_memory(exe); //Free Memory
 			return 0;
 		}
 
 		else if(bgmode == 0){
-			int child_status;
 
+			wait_and_setenv(result);
 			free_memory(exe); //Free Memory
+		}
+	}
+	
 
-			pid_t w = waitpid(result, &child_status, 0);
+	
+	return 0;
+}
+/*
+	size_t cmd_line_length = cmd_length(exe);
 
-			//convert child_status to string
-			char status_string[ count_digits(child_status) + 1];
-			sprintf(status_string, "%d", child_status);
+	pid_t child_arr[cmd_line_length]; 
+	pid_t result_fork = 0;
 
-			setenv("_", status_string, 1);
+	int result_pipe;
+	int myPipe[2];
 
+	
+		if( (result_pipe = pipe(myPipe)) == -1 ){
+			perror("pipe");
+			return 1;
+		}
+
+		result_fork = fork();
+
+		if( result_fork < 0) { //fork failed, parent process
+			perror("fork");
+			return 1;
+		}
+
+		child_arr[i] = result_fork;
+
+		if(result_fork == 0) { //child process
+			
+
+			close(myPipe[1]); //close write end of pipe
+			dup_me(STDIN_FILENO, myPipe[0]); //renaming stdin
+			start(exe); //execute program
+
+			exe = exe->prev; 
+			close(myPipe[0]); //close read in of pipe
+			dup_me(STDOUT_FILENO, myPipe[1]); //renaming stdout 
+			
+		}
+
+		else { //parent process
+
+
+			if(bgmode == 1){
+				free_memory(exe); //Free Memory
+				return 0;
+			}
+
+			else if(bgmode == 0){
+
+				for(size_t j = 0; j < cmd_line_length; j++){
+					wait_and_setenv(child_arr[j]);
+					
+				}
+
+			}
 		}
 	}
 
+	free_memory(exe); //Free Memory
 	return 0;
-}
+}*/
+
 
 void *super_malloc(size_t size) {
 
