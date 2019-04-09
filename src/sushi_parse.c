@@ -121,7 +121,7 @@ char *sushi_safe_getenv(char *name) {
 // Find the number of programs on the command line
 static size_t cmd_length(prog_t *exe) {
   int count = 0;
-  while(exe->prev) {
+  while(exe) {
     exe = exe->prev;
     count++;
   }
@@ -172,119 +172,61 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode){
-	
-	pid_t result = fork();
 
-	if(result < 0) { //fork failed, parent process
-		perror("fork");
-		return 1;
-	}
-
-	else if(result == 0) { //child process
-		int myPipe[2];
-		int result_pipe = 0;
-
-		if( (result_pipe = pipe(myPipe)) == -1 ){ //creating pipe in process
-			perror("pipe");
-			return 1; 
-		}
-
-		pid_t result2 = fork();
-
-		if(result2 == result){ //child process
-			close(myPipe[1]); //closing write end of pipe
-			dup_me(myPipe[0], 0); //renaming stdin
-			start(exe);
-		}
-
-		else{ //grandchild
-			close(myPipe[0]); //closeing read end of pipe
-			dup_me(myPipe[1], 1); //renaming stdout 
-			start(exe->prev);
-
-		}
-
-	}
-
-	else { //parent process
-
-
-		if(bgmode == 1){
-			free_memory(exe); //Free Memory
-			return 0;
-		}
-
-		else if(bgmode == 0){
-
-			wait_and_setenv(result);
-			free_memory(exe); //Free Memory
-		}
-	}
-	
-
-	
-	return 0;
-}
-/*
 	size_t cmd_line_length = cmd_length(exe);
+	int pipes[cmd_line_length-1][2];
 
-	pid_t child_arr[cmd_line_length]; 
-	pid_t result_fork = 0;
+	for(size_t i = 0; i < cmd_line_length-1; i++){
+		pipe(pipes[i]);
+	}
 
-	int result_pipe;
-	int myPipe[2];
+	pid_t child_arr[cmd_line_length];
+	int result;
 
-	
-		if( (result_pipe = pipe(myPipe)) == -1 ){
-			perror("pipe");
-			return 1;
-		}
+	for(size_t i = 0; i < cmd_line_length; i++){
+		result = fork();
 
-		result_fork = fork();
-
-		if( result_fork < 0) { //fork failed, parent process
+		if(result < 0) { //fork failed, parent process
 			perror("fork");
 			return 1;
 		}
 
-		child_arr[i] = result_fork;
+		child_arr[i] = result;
 
-		if(result_fork == 0) { //child process
-			
-
-			close(myPipe[1]); //close write end of pipe
-			dup_me(STDIN_FILENO, myPipe[0]); //renaming stdin
-			start(exe); //execute program
-
-			exe = exe->prev; 
-			close(myPipe[0]); //close read in of pipe
-			dup_me(STDOUT_FILENO, myPipe[1]); //renaming stdout 
-			
-		}
-
-		else { //parent process
-
-
-			if(bgmode == 1){
-				free_memory(exe); //Free Memory
-				return 0;
+		if(result == 0){ // child
+			if(i != 0){ // NOT at last arugment on command line. 
+				close(pipes[i-1][1]); //closing reading end of pipe
+				dup2(pipes[i-1][1], 1); //renaming stdout
 			}
 
-			else if(bgmode == 0){
-
-				for(size_t j = 0; j < cmd_line_length; j++){
-					wait_and_setenv(child_arr[j]);
-					
-				}
-
+			if(i != cmd_line_length-1){ // NOT at first argument on command line
+				
+				close(pipes[i][1]); //closing writing end of pipe
+				dup2(pipes[i][0], 0); //renaming stdin
 			}
+
+			start(exe);
 		}
 	}
+			/*
+			FIXME
+			CLOSE PIPES HERE
+			*/
 
-	free_memory(exe); //Free Memory
+	if(bgmode == 1){
+		free_memory(exe);
+		return 0;
+	}
+
+	else if(bgmode == 0){
+		for(size_t i = 0; i < cmd_line_length; i++){
+			wait_and_setenv(child_arr[i]);
+		}
+		free_memory(exe);
+	}
+	
 	return 0;
-}*/
-
+}
 
 void *super_malloc(size_t size) {
 
