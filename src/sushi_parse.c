@@ -181,6 +181,7 @@ int sushi_spawn(prog_t *exe, int bgmode){
 	}
 
 	pid_t child_arr[cmd_line_length];
+
 	int result;
 
 	for(size_t i = 0; i < cmd_line_length; i++){
@@ -194,38 +195,48 @@ int sushi_spawn(prog_t *exe, int bgmode){
 		child_arr[i] = result;
 
 		if(result == 0){ // child
-			if(i != 0){ // NOT at last arugment on command line. 
-				close(pipes[i-1][1]); //closing reading end of pipe
-				dup2(pipes[i-1][1], 1); //renaming stdout
-			}
 
-			if(i != cmd_line_length-1){ // NOT at first argument on command line
-				
-				close(pipes[i][1]); //closing writing end of pipe
-				dup2(pipes[i][0], 0); //renaming stdin
-			}
-
-			start(exe);
-		}
-	}
 			/*
 			FIXME
 			CLOSE PIPES HERE
 			*/
 
-	if(bgmode == 1){
-		free_memory(exe);
-		return 0;
+			if(i != 0){ // NOT at last arugment on command line. 			
+				dup2(pipes[i-1][0], 0); //renaming stdin
+				close(pipes[i-1][1]); //closing writing end of pipe
+			}
+
+			if(i != cmd_line_length-1){ // NOT at first argument on command line
+				dup2(pipes[i][1], 1); //renaming stdout
+				close(pipes[i][0]); //closing reading end of pipe
+			}
+
+			start(exe);
+		}
+		
+		else{
+
+			/*
+			FIXME
+			CLOSE PIPES HERE
+			*/
+
+			if(bgmode == 1){
+				free_memory(exe);
+				return 0;
+			}
+
+			else if(bgmode == 0){
+				wait_and_setenv(child_arr[i]);
+				//free_memory(exe);
+			}
+	
+
+
+		}
 	}
 
-	else if(bgmode == 0){
-		for(size_t i = 0; i < cmd_line_length; i++){
-			wait_and_setenv(child_arr[i]);
-		}
-		free_memory(exe);
-	}
-	
-	return 0;
+	return 0;	
 }
 
 void *super_malloc(size_t size) {
