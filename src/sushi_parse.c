@@ -174,7 +174,11 @@ static void dup_me (int new, int old) {
 int sushi_spawn(prog_t *exe, int bgmode){
 
 	size_t cmd_line_length = cmd_length(exe);
-	int pipes[cmd_line_length-1][2];
+	int pipes[cmd_line_length][2]; //On Linux, have to delete "-1" from cmd_line_length to get it to work
+
+	exe->args.args = super_realloc(exe->args.args, (exe->args.size + 1) * sizeof(char *));
+	exe->args.args[exe->args.size] = NULL;
+
 
 	for(size_t i = 0; i < cmd_line_length-1; i++){
 		pipe(pipes[i]);
@@ -195,12 +199,13 @@ int sushi_spawn(prog_t *exe, int bgmode){
 		child_arr[i] = result;
 
 		if(result == 0){ // child
-
+			int status = execvp(exe->args.args[0], exe->args.args);
 			/*
 			FIXME
 			CLOSE PIPES HERE
 			*/
 			for(size_t j = 0; j < cmd_line_length; j++){
+				
 				if( (j != i) || (j != i-1) ){ //if pipe not being used below
 					close(pipes[j][0]); //close both ends
 					close(pipes[j][1]);

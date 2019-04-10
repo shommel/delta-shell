@@ -11,7 +11,7 @@ CFLAGS = -Wall -pedantic -Wextra -Wcast-align -Wcast-qual \
 all: $(TARGET)
 
 sushi: $(OBJS)
-	$(CC) $(OBJS) -o $(TARGET) #-lefence
+	$(CC) $(OBJS) -o $(TARGET) -lm #-lefence
 
 sushi.o: sushi.c sushi.h
 
