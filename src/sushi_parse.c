@@ -174,7 +174,7 @@ static void dup_me (int new, int old) {
 int sushi_spawn(prog_t *exe, int bgmode){
 
 	size_t cmd_line_length = cmd_length(exe);
-	int pipes[cmd_line_length-1][2]; 
+	int pipes[cmd_line_length][2]; // DZ: Removed -1 to make my gcc happy
 
 	for(size_t i = 0; i < cmd_line_length-1; i++){
 		pipe(pipes[i]);
@@ -195,6 +195,8 @@ int sushi_spawn(prog_t *exe, int bgmode){
 		child_arr[i] = result;
 
 		if(result == 0){ // child
+		  // DZ: The next line is wrong; it starts the child PROGRAM
+		  // DZ: at once. Why do you need start() then?
 			int status = execvp(exe->args.args[0], exe->args.args);
 			/*
 			FIXME
