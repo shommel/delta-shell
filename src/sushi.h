@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <limits.h>
 
 #define SUSHI_MAX_INPUT 80 /* really modest :) */
 #define SUSHI_HISTORY_LENGTH 32

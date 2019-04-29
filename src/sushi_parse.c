@@ -8,6 +8,8 @@
 #include "sushi_yyparser.tab.h"
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/stat.h> 
+#include <fcntl.h>
 
 static char char_lookup[128] = { '\0' };
 
@@ -160,8 +162,8 @@ static void start(prog_t *exe) {
 // using the "new" descriprot (e.g., an outgoinf pipe).  This
 // functions terminates the process of error and should not be used in
 // the parent, only in a child.
-static void dup_me (int new, int old) {
-  if (new != old && -1 == dup2(new, old)) {
+static void dup_me (int old, int new) {
+  if (new != old && -1 == dup2(old, new)) {
     perror("dup2");
     exit(1);
   }
@@ -170,7 +172,7 @@ static void dup_me (int new, int old) {
 /*
  * You can use this function instead of yours if you want.
  */
-int sushi_spawn_dz(prog_t *exe, int bgmode) {
+int sushi_spawn(prog_t *exe, int bgmode) {
   int pipe_length = 0, max_pipe = cmd_length(exe);
   pid_t pid[max_pipe];
 
@@ -190,10 +192,49 @@ int sushi_spawn_dz(prog_t *exe, int bgmode) {
     case 0: // Child
       dup_me(pipefd[0], STDIN_FILENO);
       dup_me(old_stdout, STDOUT_FILENO);
-      if(pipefd[1] != STDOUT_FILENO)
-	close(pipefd[1]);
+      if(pipefd[1] != STDOUT_FILENO) close(pipefd[1]);
+
+      if(exe->redirection.in != NULL){ //stdin, “r” for <
+   //    		FILE *fp;
+			// fp = fopen(prog->args.args[0], "r");
+			// dup_me(0, fp);
+			// fclose(fp);
+
+      		int fd = open(prog->args.args[pipe_length], O_RDONLY);
+      		printf("%d%s\t%s\n", fd, "in", prog->args.args[pipe_length]);
+      		dup_me(STDIN_FILENO, fd);
+      		close(fd);
+		}
+
+	  if(exe->redirection.out1 != NULL){ //stdout, "w" for >
+	  // 		FILE *fp;
+			// fp = fopen(prog->args.args[0], "w");
+			// dup_me(1, fp);
+			// fclose(fp);
+
+	  		int fd = open(prog->args.args[pipe_length], O_WRONLY);
+      		printf("%d%s\t%s\n", fd, "out", prog->args.args[pipe_length]);
+
+      		dup_me(STDOUT_FILENO, fd);
+      		close(fd);
+		
+		}
+
+	  if(exe->redirection.out2 != NULL){ //stdout-append, "a" for >>
+	  // 		FILE *fp;
+			// file fp = fopen(prog->args.args[0], "a");
+			// dup_me(1, fp);
+			// fclose(fp);
+
+	  		int fd = open(prog->args.args[pipe_length], O_APPEND);
+      		printf("%d%s\t%s\n", fd, "out2", prog->args.args[pipe_length]);
+
+      		dup_me(STDOUT_FILENO, fd);
+      		close(fd);
+		}
       start(prog);
       exit(1);
+
     default: // Parent
       if(pipefd[0] != STDIN_FILENO) close(pipefd[0]);
       if(old_stdout != STDOUT_FILENO) close(old_stdout);
@@ -219,85 +260,6 @@ int sushi_spawn_dz(prog_t *exe, int bgmode) {
  * End of "convenience" functions
  *--------------------------------------------------------------------*/
 
-int sushi_spawn(prog_t *exe, int bgmode){
-
-	size_t cmd_line_length = cmd_length(exe);
-	int pipes[cmd_line_length-1][2]; 
-
-	for(size_t i = 0; i < cmd_line_length-1; i++){
-		pipe(pipes[i]);
-	}
-
-	pid_t child_arr[cmd_line_length];
-
-	int result;
-
-	for(size_t i = 0; i < cmd_line_length; i++){
-		result = fork();
-
-		 if(result < 0) { //fork failed, parent process
-		 	perror("fork");
-		 	exit(1);
-		}
-
-		child_arr[i] = result;
-
-		if(result == 0){ // child
-			int status = execvp(exe->args.args[0], exe->args.args);
-			/*
-			FIXME
-			CLOSE PIPES HERE
-			*/
-			for(size_t j = 0; j < cmd_line_length; j++){
-				
-				if( (j != i) || (j != i-1) ){ //if pipe not being used below
-					close(pipes[j][0]); //close both ends
-					close(pipes[j][1]);
-				}
-			}
-
-			if(i != 0){ // NOT at last arugment on command line. 			
-				dup2(pipes[i-1][0], 0); //renaming stdin
-				close(pipes[i-1][1]); //closing writing end of pipe
-			}
-
-			if(i != cmd_line_length-1){ // NOT at first argument on command line
-				dup2(pipes[i][1], 1); //renaming stdout
-				close(pipes[i][0]); //closing reading end of pipe
-			}
-
-			start(exe);
-		}
-	}
-
-	/*
-	FIXME
-	CLOSE PIPES HERE
-	*/
-
-	for(size_t i = 0; i < cmd_line_length; i++){
-			close(pipes[i][0]); //close both ends
-			close(pipes[i][1]);
-	}
-
-	if(bgmode == 1){
-		free_memory(exe);
-		return 0;
-	}
-
-	else if(bgmode == 0){
-		for(size_t i = 0; i < cmd_line_length; i++){
-			wait_and_setenv(child_arr[i]);
-		}
-
-		free_memory(exe);
-		return 0;	
-
-	}
-
-	return 0;
-}
-
 void *super_malloc(size_t size) {
 
 	void *ptr = malloc(size);
@@ -322,12 +284,29 @@ char *super_strdup(const char *ptr) {
 }
 
 
-
 /*
  * New skeleton functions
  */
+
+//learned to use PATH_MAX from link below
+//https://stackoverflow.com/questions/298510/how-to-get-the-current-directory-in-a-c-program
 void sushi_display_wd() {
+	char cwd[PATH_MAX]; //defined in limits.h
+	if(getcwd(cwd, sizeof(cwd)) == NULL){
+		perror("getcwd");
+	}
+	else{
+		printf("%s\n", cwd);
+	}
+	//free(cwd);
+
 }
 
 void sushi_change_wd(char *new_wd) {
+	int result;
+	if( (result = chdir(new_wd))== -1 ){
+		perror("chdir");
+	}
+
+	free(new_wd);
 }
