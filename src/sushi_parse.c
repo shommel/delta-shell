@@ -194,40 +194,40 @@ int sushi_spawn(prog_t *exe, int bgmode) {
       dup_me(old_stdout, STDOUT_FILENO);
       if(pipefd[1] != STDOUT_FILENO) close(pipefd[1]);
 
-      if(exe->redirection.in != NULL){ //stdin, “r” for <
+      if(prog->redirection.in != NULL){ //stdin, “r” for <
    //    		FILE *fp;
 			// fp = fopen(prog->args.args[0], "r");
 			// dup_me(0, fp);
 			// fclose(fp);
 
-      		int fd = open(prog->args.args[pipe_length], O_RDONLY);
-      		printf("%d%s\t%s\n", fd, "in", prog->args.args[pipe_length]);
+      		int fd = open(prog->args.args[0], O_RDONLY);
+      		printf("%d%s\t%s\n", fd, "in", prog->args.args[0]);
       		dup_me(STDIN_FILENO, fd);
       		close(fd);
 		}
 
-	  if(exe->redirection.out1 != NULL){ //stdout, "w" for >
+	  if(prog->redirection.out1 != NULL){ //stdout, "w" for >
 	  // 		FILE *fp;
 			// fp = fopen(prog->args.args[0], "w");
 			// dup_me(1, fp);
 			// fclose(fp);
 
-	  		int fd = open(prog->args.args[pipe_length], O_WRONLY);
-      		printf("%d%s\t%s\n", fd, "out", prog->args.args[pipe_length]);
+	  		int fd = open(prog->args.args[0], O_WRONLY);
+      		printf("%d%s\t%s\n", fd, "out", prog->args.args[0]);
 
       		dup_me(STDOUT_FILENO, fd);
       		close(fd);
 		
 		}
 
-	  if(exe->redirection.out2 != NULL){ //stdout-append, "a" for >>
+	  if(prog->redirection.out2 != NULL){ //stdout-append, "a" for >>
 	  // 		FILE *fp;
 			// file fp = fopen(prog->args.args[0], "a");
 			// dup_me(1, fp);
 			// fclose(fp);
 
-	  		int fd = open(prog->args.args[pipe_length], O_APPEND);
-      		printf("%d%s\t%s\n", fd, "out2", prog->args.args[pipe_length]);
+	  		int fd = open(prog->args.args[0], O_APPEND);
+      		printf("%d%s\t%s\n", fd, "out2", prog->args.args[0]);
 
       		dup_me(STDOUT_FILENO, fd);
       		close(fd);
