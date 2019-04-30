@@ -13,7 +13,7 @@
 #define SUSHI_DEFAULT_PROMPT "> "
 
 void char_lookup_setup();
-
+void welcome();
 char *sushi_read_line(FILE *in);
 int sushi_read_config(char *fname, int ok_if_missing);
 

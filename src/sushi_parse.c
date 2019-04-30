@@ -162,7 +162,7 @@ static void start(prog_t *exe) {
 // using the "new" descriprot (e.g., an outgoinf pipe).  This
 // functions terminates the process of error and should not be used in
 // the parent, only in a child.
-static void dup_me (int old, int new) {
+static void dup_me(int old, int new) {
   if (new != old && -1 == dup2(old, new)) {
     perror("dup2");
     exit(1);
@@ -190,50 +190,51 @@ int sushi_spawn(prog_t *exe, int bgmode) {
       perror(prog->args.args[0]);
       return 1;
     case 0: // Child
+
       dup_me(pipefd[0], STDIN_FILENO);
       dup_me(old_stdout, STDOUT_FILENO);
+
       if(pipefd[1] != STDOUT_FILENO) close(pipefd[1]);
 
-      if(prog->redirection.in != NULL){ //stdin, “r” for <
-   //    		FILE *fp;
-			// fp = fopen(prog->args.args[0], "r");
-			// dup_me(0, fp);
-			// fclose(fp);
 
-      		int fd = open(prog->args.args[0], O_RDONLY);
-      		printf("%d%s\t%s\n", fd, "in", prog->args.args[0]);
-      		dup_me(STDIN_FILENO, fd);
-      		close(fd);
+      if(prog->redirection.in != NULL){ //stdin, “r” for <
+      		int fd = open(prog->redirection.in, O_RDONLY);
+      		if(fd == -1){
+	  			perror(prog->redirection.out2);
+	  			exit(1);
+	  		}
+	  		
+      		dup_me(fd, STDIN_FILENO);
 		}
 
 	  if(prog->redirection.out1 != NULL){ //stdout, "w" for >
-	  // 		FILE *fp;
-			// fp = fopen(prog->args.args[0], "w");
-			// dup_me(1, fp);
-			// fclose(fp);
 
-	  		int fd = open(prog->args.args[0], O_WRONLY);
-      		printf("%d%s\t%s\n", fd, "out", prog->args.args[0]);
+	  		int fd = open(prog->redirection.out1, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 
-      		dup_me(STDOUT_FILENO, fd);
-      		close(fd);
-		
+		  	if(fd == -1){
+		  			perror(prog->redirection.out2);
+		  			exit(1);
+		  		}
+
+      		dup_me(fd, STDOUT_FILENO);
 		}
 
 	  if(prog->redirection.out2 != NULL){ //stdout-append, "a" for >>
-	  // 		FILE *fp;
-			// file fp = fopen(prog->args.args[0], "a");
-			// dup_me(1, fp);
-			// fclose(fp);
 
-	  		int fd = open(prog->args.args[0], O_APPEND);
-      		printf("%d%s\t%s\n", fd, "out2", prog->args.args[0]);
+	  		int fd = open(prog->redirection.out2, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
 
-      		dup_me(STDOUT_FILENO, fd);
-      		close(fd);
+	  		if(fd == -1){
+	  			perror(prog->redirection.out2);
+	  			exit(1);
+	  		}
+
+      		dup_me(fd, STDOUT_FILENO);
 		}
+
       start(prog);
       exit(1);
+
+
 
     default: // Parent
       if(pipefd[0] != STDIN_FILENO) close(pipefd[0]);

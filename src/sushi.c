@@ -7,6 +7,12 @@
 
 int sushi_exit = 0;
 
+void welcome(){
+	//displaying welcome message
+	printf("%s\n%s\n%s\n%s\n", "###############", "Welcome to SUSHI", 
+		"Spencer Hommel, 2019 (patent pending)", "###############");
+}
+
 static void refuse_to_die(int sig)
 {
 	if(sig == SIGINT){
@@ -32,6 +38,8 @@ static void prevent_interruption() {
 }
 
 int main(int argc, char const *argv[]) {
+
+	welcome();
 
 	int setenv_result;
 	if( (setenv_result = setenv("SHELL", argv[0], 1) ) != 0){
