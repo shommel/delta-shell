@@ -209,6 +209,7 @@ int sushi_spawn(prog_t *exe, int bgmode) {
 
 	  if(prog->redirection.out1 != NULL){ //stdout, "w" for >
 
+	    // DZ: Must have added O_TRUNC!
 	  		int fd = open(prog->redirection.out1, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 
 		  	if(fd == -1){
@@ -306,6 +307,7 @@ void sushi_display_wd() {
 void sushi_change_wd(char *new_wd) {
 	int result;
 	if( (result = chdir(new_wd))== -1 ){
+	  // DZ: Must be perror(new_wd)
 		perror("chdir");
 	}
 
