@@ -1,4 +1,4 @@
-Introducing, # SUSHI (Suffolk University SHell.... i, SUSH sounded a little strange so we added an i at the end).
+Introducing, SUSHI (Suffolk University SHell.... i, SUSH sounded a little strange so we added an i at the end).
 
 Part of CMPSC-355 Operating Systems.
 
